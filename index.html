@@ -12,18 +12,18 @@
   <style>
     :root {
       --bg-base: #060913;
-      --card-surface: rgba(13, 20, 36, 0.75);
+      --card-surface: rgba(13, 20, 36, 0.78);
       --card-border: rgba(56, 189, 248, 0.12);
-      --card-border-glow: rgba(45, 212, 191, 0.25);
+      --card-border-glow: rgba(45, 212, 191, 0.3);
       --text-main: #f1f5f9;
       --text-dim: #64748b;
       --text-sub: #94a3b8;
       --cyan-neon: #2dd4bf;
       --cyan-bright: #38bdf8;
       --cyan-gradient: linear-gradient(135deg, #2dd4bf 0%, #06b6d4 50%, #3b82f6 100%);
-      --card-grad: linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%);
-      --bar-grad: linear-gradient(180deg, #2dd4bf 0%, #0284c7 100%);
+      --card-grad: linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.85) 100%);
       --danger: #fb7185;
+      --warning: #fbbf24;
       --font-mono: 'JetBrains Mono', monospace;
     }
 
@@ -48,7 +48,6 @@
       overflow-x: hidden;
     }
 
-    /* Bloklangan ekran */
     #blockedScreen {
       display: none;
       min-height: 80vh;
@@ -69,10 +68,8 @@
       justify-content: center;
       font-size: 32px;
       margin-bottom: 18px;
-      box-shadow: 0 0 35px rgba(251, 113, 133, 0.2);
     }
 
-    /* Asosiy konteyner */
     #appContent {
       display: block;
       animation: fadeIn 0.35s ease;
@@ -83,12 +80,11 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Dashboard Header */
     .dash-nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .dash-title {
@@ -98,13 +94,6 @@
       background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-    }
-
-    .dash-sub {
-      font-size: 11px;
-      color: var(--text-dim);
-      font-weight: 500;
-      margin-top: 2px;
     }
 
     .top-badge {
@@ -118,7 +107,6 @@
       font-size: 11px;
       font-weight: 700;
       color: var(--cyan-neon);
-      backdrop-filter: blur(10px);
     }
 
     .top-badge::before {
@@ -130,7 +118,7 @@
       box-shadow: 0 0 10px var(--cyan-neon);
     }
 
-    /* Hero Karta - Analytics Banner */
+    /* Hero Karta */
     .hero-panel {
       position: relative;
       background: var(--card-grad);
@@ -140,25 +128,6 @@
       backdrop-filter: blur(20px);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
       margin-bottom: 16px;
-      overflow: hidden;
-    }
-
-    .hero-panel::after {
-      content: '';
-      position: absolute;
-      top: -40px;
-      right: -40px;
-      width: 120px;
-      height: 120px;
-      background: radial-gradient(circle, rgba(45, 212, 191, 0.2) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .panel-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
     }
 
     .meta-tag {
@@ -170,71 +139,54 @@
     }
 
     .balance-display {
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 800;
       font-family: var(--font-mono);
       letter-spacing: -1px;
       color: #fff;
-      margin-bottom: 18px;
+      margin: 8px 0 16px;
       display: flex;
       align-items: baseline;
       gap: 6px;
     }
 
     .balance-display span {
-      font-size: 16px;
+      font-size: 15px;
       color: var(--cyan-neon);
       font-weight: 600;
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Cyan Funnel Barlar (Dashboarddagidek) */
-    .metrics-grid {
+    /* Qarzlar Ko'rsatkichi Paneli */
+    .debt-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
       padding-top: 14px;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .metric-col {
+    .debt-card {
       background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 14px;
-      padding: 10px 6px;
-      text-align: center;
+      padding: 10px 12px;
     }
 
-    .metric-val {
-      font-size: 13px;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      color: #fff;
-    }
-
-    .metric-bar-wrap {
-      width: 100%;
-      height: 28px;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 8px;
-      margin: 8px 0 6px;
-      display: flex;
-      align-items: flex-end;
-      overflow: hidden;
-    }
-
-    .metric-bar-fill {
-      width: 100%;
-      background: var(--bar-grad);
-      border-radius: 6px 6px 0 0;
-      box-shadow: 0 0 14px rgba(45, 212, 191, 0.4);
-      transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .metric-label {
-      font-size: 10px;
+    .debt-lbl {
+      font-size: 11px;
       color: var(--text-dim);
       font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .debt-val {
+      font-size: 14px;
+      font-weight: 700;
+      font-family: var(--font-mono);
     }
 
     /* Tugmalar */
@@ -242,7 +194,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .btn-dashboard {
@@ -256,12 +208,11 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: transform 0.15s, opacity 0.15s;
+      transition: transform 0.15s;
     }
 
     .btn-dashboard:active {
       transform: scale(0.97);
-      opacity: 0.9;
     }
 
     .btn-cyan {
@@ -276,7 +227,6 @@
       border: 1px solid var(--card-border);
     }
 
-    /* Grafik kartasi */
     .card-box {
       background: var(--card-surface);
       border: 1px solid var(--card-border);
@@ -296,7 +246,6 @@
     .head-title {
       font-size: 14px;
       font-weight: 700;
-      letter-spacing: -0.2px;
     }
 
     .head-link {
@@ -308,11 +257,11 @@
 
     .chart-wrapper {
       position: relative;
-      height: 200px;
+      height: 210px;
       width: 100%;
     }
 
-    /* Tranzaksiya qatorlari */
+    /* Tranzaksiyalar */
     .tx-row {
       display: flex;
       justify-content: space-between;
@@ -332,15 +281,15 @@
     }
 
     .tx-icon-pill {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 12px;
       background: rgba(45, 212, 191, 0.08);
       border: 1px solid rgba(45, 212, 191, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 17px;
     }
 
     .tx-name {
@@ -359,6 +308,7 @@
       font-family: var(--font-mono);
       font-size: 14px;
       font-weight: 700;
+      text-align: right;
     }
 
     /* Modal Sheet */
@@ -366,7 +316,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(10px);
       z-index: 1000;
       align-items: flex-end;
@@ -378,7 +328,8 @@
       border-radius: 26px 26px 0 0;
       width: 100%;
       padding: 24px 20px 34px;
-      box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.7);
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .input-box {
@@ -390,23 +341,58 @@
       color: #fff;
       font-size: 16px;
       outline: none;
-      margin-bottom: 12px;
-      transition: border-color 0.2s;
+      margin-bottom: 14px;
     }
 
     .input-box:focus {
       border-color: var(--cyan-neon);
     }
+
+    /* Toifalar Chipslari */
+    .chips-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .chips-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .chip-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chip-item.active {
+      background: var(--cyan-neon);
+      color: #04101e;
+      border-color: transparent;
+      box-shadow: 0 0 15px rgba(45, 212, 191, 0.4);
+    }
   </style>
 </head>
 <body>
 
-  <!-- Begonalar uchun Blok Ekran -->
+  <!-- Bloklangan ekran -->
   <div id="blockedScreen">
     <div class="lock-pill">🔒</div>
-    <h3 style="font-size: 19px; font-weight: 800; margin-bottom: 8px;">Maxfiy Boshqaruv</h3>
+    <h3 style="font-size: 19px; font-weight: 800; margin-bottom: 8px;">Maxfiy Tizim</h3>
     <p style="color: var(--text-dim); font-size: 13px; max-width: 260px;">
-      Ushbu analitik panel faqat belgilangan 2 ta hisob egasi uchun ochiq.
+      Bu panel faqat ruxsat berilgan 2 ta foydalanuvchi uchun ochiq.
     </p>
   </div>
 
@@ -414,51 +400,26 @@
   <div id="appContent">
     <div class="dash-nav">
       <div>
-        <div class="dash-title">Revenue & Expenses</div>
-        <div class="dash-sub">Shaxsiy Kapital Nazorati</div>
+        <div class="dash-title">Moliya Pro</div>
+        <div style="font-size: 11px; color: var(--text-dim);">Xarajat, Kirim & Nasiya Nazorati</div>
       </div>
-      <div class="top-badge" id="userPill">Live Analytics</div>
+      <div class="top-badge" id="userPill">Live Pro</div>
     </div>
 
-    <!-- Analytics Hero Banner -->
+    <!-- Asosiy Balans -->
     <div class="hero-panel">
-      <div class="panel-meta">
-        <span class="meta-tag">Sof Kapital Balansi</span>
-        <span style="font-size: 12px; color: var(--cyan-neon); font-weight: 700;">● Active</span>
-      </div>
-      <div class="balance-display" id="totalBalanceVal">
-        0 <span>UZS</span>
-      </div>
+      <div class="meta-tag">Sof Kapital</div>
+      <div class="balance-display" id="totalBalanceVal">0 <span>UZS</span></div>
 
-      <!-- Funnel Progress Barlar -->
-      <div class="metrics-grid">
-        <div class="metric-col">
-          <div class="metric-val" id="funnelInc">0k</div>
-          <div class="metric-bar-wrap">
-            <div class="metric-bar-fill" id="bar1" style="height: 65%;"></div>
-          </div>
-          <div class="metric-label">Kirim</div>
+      <!-- Qarzlar Balansi -->
+      <div class="debt-grid">
+        <div class="debt-card">
+          <div class="debt-lbl">🤝 Menga berishlari kerak</div>
+          <div class="debt-val" style="color: var(--cyan-neon);" id="debtGivenTotal">0 UZS</div>
         </div>
-        <div class="metric-col">
-          <div class="metric-val" id="funnelExp">0k</div>
-          <div class="metric-bar-wrap">
-            <div class="metric-bar-fill" id="bar2" style="height: 45%;"></div>
-          </div>
-          <div class="metric-label">Xarajat</div>
-        </div>
-        <div class="metric-col">
-          <div class="metric-val" id="funnelSave">0%</div>
-          <div class="metric-bar-wrap">
-            <div class="metric-bar-fill" id="bar3" style="height: 80%;"></div>
-          </div>
-          <div class="metric-label">Jamg'arma</div>
-        </div>
-        <div class="metric-col">
-          <div class="metric-val" id="funnelTx">0 ta</div>
-          <div class="metric-bar-wrap">
-            <div class="metric-bar-fill" id="bar4" style="height: 35%;"></div>
-          </div>
-          <div class="metric-label">Amallar</div>
+        <div class="debt-card">
+          <div class="debt-lbl">⚠️ Men berishim kerak</div>
+          <div class="debt-val" style="color: var(--warning);" id="debtTakenTotal">0 UZS</div>
         </div>
       </div>
     </div>
@@ -467,18 +428,18 @@
     <div class="action-row">
       <button class="btn-dashboard btn-cyan" onclick="openInput('income')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-        Kirim Kiritish
+        Kirim / Pul olish
       </button>
       <button class="btn-dashboard btn-dark" onclick="openInput('expense')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/></svg>
-        Xarajat Yozish
+        Xarajat / To'lov
       </button>
     </div>
 
-    <!-- Grafik Paneli -->
+    <!-- Diagramma -->
     <div class="card-box">
       <div class="card-head">
-        <span class="head-title">Toifalar Bo'yicha Tahlil</span>
+        <span class="head-title">Yo'nalishlar Bo'yicha Tahlil</span>
         <span class="head-link">Analytics</span>
       </div>
       <div class="chart-wrapper">
@@ -489,22 +450,29 @@
     <!-- Oxirgi Tranzaksiyalar -->
     <div class="card-box">
       <div class="card-head">
-        <span class="head-title">So'nggi O'tkazmalar</span>
+        <span class="head-title">So'nggi Amallar</span>
         <span class="head-link" onclick="clearAllData()">Tozalash</span>
       </div>
       <div id="txList">
-        <p style="text-align: center; color: var(--text-dim); font-size: 13px; padding: 12px;">Hozircha amaliyotlar mavjud emas</p>
+        <p style="text-align: center; color: var(--text-dim); font-size: 13px; padding: 12px;">Hozircha amaliyotlar yo'q</p>
       </div>
     </div>
   </div>
 
-  <!-- Modal Kiritish -->
+  <!-- Kiritish modali -->
   <div class="modal-overlay" id="inputModal">
     <div class="modal-sheet">
       <h3 id="modalTitle" style="font-size: 17px; font-weight: 700; margin-bottom: 14px;">Yangi Amal</h3>
-      <input type="number" id="inAmt" class="input-box" placeholder="Summa (masalan: 120000)" inputmode="numeric">
-      <input type="text" id="inCat" class="input-box" placeholder="Kategoriya (masalan: Oylik, Cafe, Yoqilg'i)">
       
+      <div class="chips-label">Summani kiriting:</div>
+      <input type="number" id="inAmt" class="input-box" placeholder="Masalan: 45000" inputmode="numeric">
+
+      <div class="chips-label">Tezkor Toifalar:</div>
+      <div class="chips-group" id="chipsContainer"></div>
+
+      <div class="chips-label">Izoh / Kimga yoki Nima uchun:</div>
+      <input type="text" id="inCat" class="input-box" placeholder="Masalan: Yandex Go, Bozorlik yoki Ali qarz">
+
       <button class="btn-dashboard btn-cyan" id="saveBtn" style="width: 100%; margin-top: 6px;" onclick="addRecord()">
         Tasdiqlash & Saqlash
       </button>
@@ -535,17 +503,47 @@
       document.getElementById('userPill').innerText = userName;
     }
 
-    let records = JSON.parse(localStorage.getItem('moliya_data_v2') || '[]');
+    // Yangi toifalar ro'yxati
+    const EXPENSE_CATEGORIES = [
+      { name: '🚕 Taksi', icon: '🚕' },
+      { name: '🍽 Oziq-ovqat', icon: '🍽' },
+      { name: '💡 Kommunal', icon: '💡' },
+      { name: '🤝 Qarz berdim', icon: '🤝' },
+      { name: '💸 Qarz qaytardim', icon: '💸' },
+      { name: '🛍 Bozor / Kiyim', icon: '🛍' },
+      { name: '☕ Kafe / Fastfood', icon: '☕' }
+    ];
+
+    const INCOME_CATEGORIES = [
+      { name: '💼 Oylik Maosh', icon: '💼' },
+      { name: '🤝 Qarz oldim', icon: '🤝' },
+      { name: '💵 Qarz qaytib keldi', icon: '💵' },
+      { name: '📈 Foyda / Savdo', icon: '📈' },
+      { name: '🎁 Boshqa kirim', icon: '🎁' }
+    ];
+
+    let records = JSON.parse(localStorage.getItem('moliya_data_v3') || '[]');
     let currentMode = 'expense';
     let chartObj = null;
 
     function openInput(mode) {
       currentMode = mode;
-      document.getElementById('modalTitle').innerText = mode === 'income' ? "Kirim qo'shish" : "Xarajat kiritish";
+      document.getElementById('modalTitle').innerText = mode === 'income' ? "Kirim / Pul Olish" : "Xarajat / Chiqim Kiritish";
+      
+      const chipsBox = document.getElementById('chipsContainer');
+      const cats = mode === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+      chipsBox.innerHTML = cats.map(c => `<div class="chip-item" onclick="selectChip('${c.name}')">${c.name}</div>`).join('');
+
       document.getElementById('inAmt').value = '';
       document.getElementById('inCat').value = '';
       document.getElementById('inputModal').style.display = 'flex';
       if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+    }
+
+    function selectChip(name) {
+      document.getElementById('inCat').value = name;
+      document.querySelectorAll('.chip-item').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
     }
 
     function closeInput() {
@@ -563,19 +561,20 @@
         type: currentMode,
         amount: amt,
         category: cat,
-        date: new Date().toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' })
+        date: new Date().toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' }),
+        time: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
       });
 
-      localStorage.setItem('moliya_data_v2', JSON.stringify(records));
+      localStorage.setItem('moliya_data_v3', JSON.stringify(records));
       closeInput();
       renderAll();
       if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
     }
 
     function clearAllData() {
-      if (confirm("Barcha hisobotlar o'chirilsinmi?")) {
+      if (confirm("Barcha amaliyotlar o'chirilsinmi?")) {
         records = [];
-        localStorage.removeItem('moliya_data_v2');
+        localStorage.removeItem('moliya_data_v3');
         renderAll();
       }
     }
@@ -583,6 +582,8 @@
     function renderAll() {
       let incomeSum = 0;
       let expenseSum = 0;
+      let debtGiven = 0; // Menga berishlari kerak
+      let debtTaken = 0; // Men berishim kerak
       const catStats = {};
 
       records.forEach(r => {
@@ -592,44 +593,48 @@
           expenseSum += r.amount;
           catStats[r.category] = (catStats[r.category] || 0) + r.amount;
         }
+
+        // Qarzlar hisob-kitobi
+        if (r.category.includes('Qarz berdim')) debtGiven += r.amount;
+        if (r.category.includes('Qarz qaytib keldi')) debtGiven -= r.amount;
+        if (r.category.includes('Qarz oldim')) debtTaken += r.amount;
+        if (r.category.includes('Qarz qaytardim')) debtTaken -= r.amount;
       });
 
       const netBalance = incomeSum - expenseSum;
 
       document.getElementById('totalBalanceVal').innerHTML = `${netBalance.toLocaleString()} <span>UZS</span>`;
-      
-      // Funnel ko'rsatkichlari
-      document.getElementById('funnelInc').innerText = incomeSum > 999999 ? (incomeSum/1000000).toFixed(1) + 'M' : (incomeSum/1000).toFixed(0) + 'k';
-      document.getElementById('funnelExp').innerText = expenseSum > 999999 ? (expenseSum/1000000).toFixed(1) + 'M' : (expenseSum/1000).toFixed(0) + 'k';
-      const saveRate = incomeSum > 0 ? Math.max(0, Math.round(((incomeSum - expenseSum) / incomeSum) * 100)) : 0;
-      document.getElementById('funnelSave').innerText = saveRate + '%';
-      document.getElementById('funnelTx').innerText = records.length + ' ta';
-
-      // Bar balandliklari
-      document.getElementById('bar1').style.height = Math.min(100, Math.max(20, (incomeSum / (incomeSum + expenseSum || 1)) * 100)) + '%';
-      document.getElementById('bar2').style.height = Math.min(100, Math.max(20, (expenseSum / (incomeSum + expenseSum || 1)) * 100)) + '%';
-      document.getElementById('bar3').style.height = Math.max(15, saveRate) + '%';
-      document.getElementById('bar4').style.height = Math.min(100, Math.max(20, records.length * 10)) + '%';
+      document.getElementById('debtGivenTotal').innerText = `${Math.max(0, debtGiven).toLocaleString()} UZS`;
+      document.getElementById('debtTakenTotal').innerText = `${Math.max(0, debtTaken).toLocaleString()} UZS`;
 
       // Ro'yxat
       const listEl = document.getElementById('txList');
       if (records.length === 0) {
-        listEl.innerHTML = `<p style="text-align: center; color: var(--text-dim); font-size: 13px; padding: 12px;">Hozircha amaliyotlar mavjud emas</p>`;
+        listEl.innerHTML = `<p style="text-align: center; color: var(--text-dim); font-size: 13px; padding: 12px;">Hozircha amaliyotlar yo'q</p>`;
       } else {
-        listEl.innerHTML = records.slice(0, 8).map(r => `
-          <div class="tx-row">
-            <div class="tx-left">
-              <div class="tx-icon-pill">${r.type === 'income' ? '⚡' : '💸'}</div>
-              <div>
-                <div class="tx-name">${r.category}</div>
-                <div class="tx-date">${r.date}</div>
+        listEl.innerHTML = records.slice(0, 10).map(r => {
+          let icon = '💸';
+          if (r.category.includes('Taksi')) icon = '🚕';
+          else if (r.category.includes('Oziq-ovqat')) icon = '🍽';
+          else if (r.category.includes('Kommunal')) icon = '💡';
+          else if (r.category.includes('Qarz')) icon = '🤝';
+          else if (r.type === 'income') icon = '⚡';
+
+          return `
+            <div class="tx-row">
+              <div class="tx-left">
+                <div class="tx-icon-pill">${icon}</div>
+                <div>
+                  <div class="tx-name">${r.category}</div>
+                  <div class="tx-date">${r.date} • ${r.time || ''}</div>
+                </div>
+              </div>
+              <div class="tx-amt" style="color: ${r.type === 'income' ? 'var(--cyan-neon)' : 'var(--danger)'}">
+                ${r.type === 'income' ? '+' : '-'}${r.amount.toLocaleString()} UZS
               </div>
             </div>
-            <div class="tx-amt" style="color: ${r.type === 'income' ? 'var(--cyan-neon)' : 'var(--danger)'}">
-              ${r.type === 'income' ? '+' : '-'}${r.amount.toLocaleString()} UZS
-            </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       }
 
       renderChart(catStats);
@@ -648,11 +653,11 @@
       chartObj = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: labels.length ? labels : ['Mavjud emas'],
+          labels: labels.length ? labels : ['Xarajat yo\'q'],
           datasets: [{
             data: data.length ? data : [1],
             backgroundColor: labels.length 
-              ? ['#2dd4bf', '#38bdf8', '#0284c7', '#818cf8', '#c084fc', '#fb7185']
+              ? ['#2dd4bf', '#38bdf8', '#0284c7', '#fbbf24', '#f43f5e', '#a855f7', '#64748b']
               : ['rgba(255, 255, 255, 0.05)'],
             borderWidth: 0,
             hoverOffset: 6
@@ -668,7 +673,7 @@
               labels: { 
                 color: '#94a3b8', 
                 font: { size: 11, family: "'Plus Jakarta Sans', sans-serif", weight: '600' },
-                padding: 12,
+                padding: 10,
                 boxWidth: 8
               }
             }
