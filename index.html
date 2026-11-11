@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Moliya Pro — Analitika</title>
+  <title>Moliya Pro Ultimate</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,12 +12,11 @@
   <style>
     :root {
       --bg-base: #060913;
-      --card-surface: rgba(13, 20, 36, 0.78);
+      --card-surface: rgba(13, 20, 36, 0.82);
       --card-border: rgba(56, 189, 248, 0.12);
       --card-border-glow: rgba(45, 212, 191, 0.3);
       --text-main: #f1f5f9;
       --text-dim: #64748b;
-      --text-sub: #94a3b8;
       --cyan-neon: #2dd4bf;
       --cyan-bright: #38bdf8;
       --cyan-gradient: linear-gradient(135deg, #2dd4bf 0%, #06b6d4 50%, #3b82f6 100%);
@@ -27,539 +26,175 @@
       --font-mono: 'JetBrains Mono', monospace;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body {
       background-color: var(--bg-base);
-      background-image: 
-        radial-gradient(ellipse at 15% 0%, rgba(45, 212, 191, 0.15) 0%, transparent 45%),
-        radial-gradient(ellipse at 85% 10%, rgba(56, 189, 248, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 100%, rgba(15, 23, 42, 0.8) 0%, transparent 60%);
-      color: var(--text-main);
-      min-height: 100vh;
-      padding: 16px 14px 40px;
-      overflow-x: hidden;
+      background-image: radial-gradient(ellipse at 15% 0%, rgba(45, 212, 191, 0.15) 0%, transparent 45%), radial-gradient(ellipse at 85% 10%, rgba(56, 189, 248, 0.12) 0%, transparent 50%);
+      color: var(--text-main); min-height: 100vh; padding: 16px 14px 50px;
     }
 
-    #blockedScreen {
-      display: none;
-      min-height: 80vh;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
+    #blockedScreen { display: none; min-height: 80vh; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    #appContent { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-    .lock-pill {
-      width: 72px;
-      height: 72px;
-      border-radius: 24px;
-      background: rgba(251, 113, 133, 0.1);
-      border: 1px solid rgba(251, 113, 133, 0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      margin-bottom: 18px;
-    }
+    .dash-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .dash-title { font-size: 20px; font-weight: 800; background: linear-gradient(180deg, #fff 30%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .top-badge { display: flex; align-items: center; gap: 6px; padding: 5px 12px; background: rgba(45, 212, 191, 0.08); border: 1px solid var(--card-border-glow); border-radius: 100px; font-size: 11px; font-weight: 700; color: var(--cyan-neon); }
 
-    #appContent {
-      display: block;
-      animation: fadeIn 0.35s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .dash-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .dash-title {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .top-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      background: rgba(45, 212, 191, 0.08);
-      border: 1px solid var(--card-border-glow);
-      border-radius: 100px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--cyan-neon);
-    }
-
-    .top-badge::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--cyan-neon);
-      box-shadow: 0 0 10px var(--cyan-neon);
-    }
-
-    /* Vaqt Filterlari (Tablar) */
-    .filter-tabs {
-      display: flex;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 4px;
-      gap: 4px;
-      margin-bottom: 16px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      border: none;
-      background: transparent;
-      color: var(--text-dim);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 8px 4px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .tab-btn.active {
-      background: var(--cyan-neon);
-      color: #04101e;
-      box-shadow: 0 2px 10px rgba(45, 212, 191, 0.35);
-    }
-
-    /* Hero Karta */
+    /* Asosiy Balans & Bugungi Sarf */
     .hero-panel {
-      position: relative;
-      background: var(--card-grad);
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: 20px 18px;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
-      margin-bottom: 16px;
+      position: relative; background: var(--card-grad); border: 1px solid var(--card-border); border-radius: 22px; padding: 18px 16px;
+      backdrop-filter: blur(20px); margin-bottom: 14px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
     }
+    .balance-display { font-size: 28px; font-weight: 800; font-family: var(--font-mono); color: #fff; margin: 6px 0 12px; }
+    .balance-display span { font-size: 14px; color: var(--cyan-neon); font-family: 'Plus Jakarta Sans', sans-serif; }
 
-    .meta-tag {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-dim);
-      font-weight: 700;
+    .today-highlight {
+      display: flex; justify-content: space-between; align-items: center; background: rgba(251, 113, 133, 0.08);
+      border: 1px solid rgba(251, 113, 133, 0.2); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px;
     }
+    .today-title { font-size: 12px; font-weight: 600; color: var(--danger); display: flex; align-items: center; gap: 6px; }
+    .today-sum { font-family: var(--font-mono); font-size: 15px; font-weight: 800; color: #fff; }
 
-    .balance-display {
-      font-size: 28px;
-      font-weight: 800;
-      font-family: var(--font-mono);
-      letter-spacing: -1px;
-      color: #fff;
-      margin: 8px 0 14px;
-      display: flex;
-      align-items: baseline;
-      gap: 6px;
+    .debt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 12px; }
+    .debt-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 8px 10px; }
+    .debt-lbl { font-size: 10px; color: var(--text-dim); font-weight: 600; margin-bottom: 3px; }
+    .debt-val { font-size: 13px; font-weight: 700; font-family: var(--font-mono); }
+
+    /* Tugmalar */
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .btn-act {
+      border: none; padding: 13px; border-radius: 14px; font-size: 13px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
     }
+    .btn-cyan { background: var(--cyan-gradient); color: #04101e; }
+    .btn-dark { background: rgba(30, 41, 59, 0.7); color: #fff; border: 1px solid var(--card-border); }
 
-    .balance-display span {
-      font-size: 15px;
-      color: var(--cyan-neon);
-      font-weight: 600;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+    .card-box { background: var(--card-surface); border: 1px solid var(--card-border); border-radius: 20px; padding: 16px; margin-bottom: 14px; backdrop-filter: blur(14px); }
+    .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .head-title { font-size: 14px; font-weight: 700; }
+
+    /* Kunbay arxiv tablari */
+    .archive-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
+    .arc-chip {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 12px; border-radius: 10px;
+      font-size: 11px; font-weight: 600; color: var(--text-dim); white-space: nowrap; cursor: pointer;
     }
+    .arc-chip.active { background: var(--cyan-neon); color: #04101e; border-color: transparent; font-weight: 700; }
 
-    .period-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .p-stat {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 8px 10px;
-    }
-
-    .p-lbl {
-      font-size: 10px;
-      color: var(--text-dim);
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .p-val {
-      font-size: 14px;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      margin-top: 2px;
-    }
-
-    /* Tezkor Tugmalar */
-    .action-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .btn-dashboard {
-      border: none;
-      padding: 13px 14px;
-      border-radius: 16px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform 0.15s;
-    }
-
-    .btn-dashboard:active {
-      transform: scale(0.97);
-    }
-
-    .btn-cyan {
-      background: var(--cyan-gradient);
-      color: #04101e;
-      box-shadow: 0 10px 25px -5px rgba(45, 212, 191, 0.4);
-    }
-
-    .btn-dark {
-      background: rgba(30, 41, 59, 0.7);
-      color: #fff;
-      border: 1px solid var(--card-border);
-    }
-
-    .card-box {
-      background: var(--card-surface);
-      border: 1px solid var(--card-border);
-      border-radius: 22px;
-      padding: 18px;
-      margin-bottom: 16px;
-      backdrop-filter: blur(14px);
-    }
-
-    .card-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    .head-title {
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .head-link {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--cyan-neon);
-      cursor: pointer;
-    }
-
-    /* Kategoriya bo'yicha saralangan xarajatlar ro'yxati */
-    .cat-bar-item {
-      margin-bottom: 12px;
-    }
-
-    .cat-bar-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .cat-info-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      margin-bottom: 4px;
-    }
-
-    .cat-title-text {
-      font-weight: 600;
-      color: #e2e8f0;
-    }
-
-    .cat-amount-text {
-      font-family: var(--font-mono);
-      font-weight: 700;
-      color: var(--danger);
-    }
-
-    .progress-track {
-      width: 100%;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--cyan-neon);
-      border-radius: 10px;
-      transition: width 0.4s ease;
-    }
-
-    .chart-wrapper {
-      position: relative;
-      height: 200px;
-      width: 100%;
-    }
-
-    /* Tranzaksiyalar */
+    /* Amallar qatori va Tahrirlash/O'chirish */
     .tx-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 11px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
+    .tx-row:last-child { border-bottom: none; }
+    .tx-left { display: flex; align-items: center; gap: 10px; }
+    .tx-icon-pill { width: 34px; height: 34px; border-radius: 10px; background: rgba(45, 212, 191, 0.08); display: flex; align-items: center; justify-content: center; font-size: 15px; }
+    .tx-name { font-size: 13px; font-weight: 600; color: #e2e8f0; }
+    .tx-date { font-size: 10px; color: var(--text-dim); }
+    .tx-right { text-align: right; display: flex; align-items: center; gap: 8px; }
+    .tx-amt { font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
+    
+    .btn-icon { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-dim); border-radius: 8px; padding: 5px 8px; font-size: 11px; cursor: pointer; }
+    .btn-del { color: var(--danger); border-color: rgba(251, 113, 133, 0.2); }
 
-    .tx-row:last-child {
-      border-bottom: none;
-    }
-
-    .tx-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .tx-icon-pill {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-      background: rgba(45, 212, 191, 0.08);
-      border: 1px solid rgba(45, 212, 191, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-    }
-
-    .tx-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: #e2e8f0;
-    }
-
-    .tx-date {
-      font-size: 10px;
-      color: var(--text-dim);
-      margin-top: 1px;
-    }
-
-    .tx-amt {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      font-weight: 700;
-      text-align: right;
-    }
-
-    /* Modal */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-      align-items: flex-end;
-    }
-
-    .modal-sheet {
-      background: #090e1a;
-      border-top: 1px solid var(--card-border-glow);
-      border-radius: 26px 26px 0 0;
-      width: 100%;
-      padding: 22px 18px 32px;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .input-box {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 13px 15px;
-      color: #fff;
-      font-size: 16px;
-      outline: none;
-      margin-bottom: 12px;
-    }
-
-    .input-box:focus {
-      border-color: var(--cyan-neon);
-    }
-
-    .chips-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .chips-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-bottom: 14px;
-    }
-
-    .chip-item {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 7px 11px;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-sub);
-      cursor: pointer;
-    }
-
-    .chip-item.active {
-      background: var(--cyan-neon);
-      color: #04101e;
-      border-color: transparent;
-      box-shadow: 0 0 12px rgba(45, 212, 191, 0.4);
-    }
+    /* Modallar */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 1000; align-items: flex-end; }
+    .modal-sheet { background: #090e1a; border-top: 1px solid var(--card-border-glow); border-radius: 24px 24px 0 0; width: 100%; padding: 22px 18px 34px; max-height: 90vh; overflow-y: auto; }
+    .input-box { width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 12px; color: #fff; font-size: 15px; outline: none; margin-bottom: 12px; }
+    .chips-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .chip-item { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; color: #94a3b8; cursor: pointer; }
+    .chip-item.active { background: var(--cyan-neon); color: #04101e; border-color: transparent; }
   </style>
 </head>
 <body>
 
   <div id="blockedScreen">
-    <div class="lock-pill">🔒</div>
-    <h3 style="font-size: 19px; font-weight: 800; margin-bottom: 8px;">Maxfiy Tizim</h3>
-    <p style="color: var(--text-dim); font-size: 13px; max-width: 260px;">
-      Bu panel faqat ruxsat berilgan hisob egalari uchun ochiq.
-    </p>
+    <h3 style="font-size: 18px; margin-bottom: 6px;">Kirish Cheklangan 🔒</h3>
   </div>
 
   <div id="appContent">
     <div class="dash-nav">
       <div>
         <div class="dash-title">Moliya Pro</div>
-        <div style="font-size: 11px; color: var(--text-dim);">Tahlil & Nazorat Paneli</div>
+        <div style="font-size: 11px; color: var(--text-dim);">Xarajat, Kunbay Arxiv & Qarz Nazorati</div>
       </div>
       <div class="top-badge" id="userPill">Live Pro</div>
     </div>
 
-    <!-- Vaqt Filtrlari (Tablar) -->
-    <div class="filter-tabs">
-      <button class="tab-btn active" onclick="setPeriod('month')">Shu oy (30 k)</button>
-      <button class="tab-btn" onclick="setPeriod('week')">Haftalik (7 k)</button>
-      <button class="tab-btn" onclick="setPeriod('today')">Bugun</button>
-      <button class="tab-btn" onclick="setPeriod('all')">Barchasi</button>
-    </div>
-
-    <!-- Hero Karta -->
+    <!-- Asosiy Balans -->
     <div class="hero-panel">
-      <div class="meta-tag" id="periodLabel">Shu Oylik Sof Balans</div>
+      <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Sof Kapital</div>
       <div class="balance-display" id="totalBalanceVal">0 <span>UZS</span></div>
 
-      <div class="period-stats">
-        <div class="p-stat">
-          <div class="p-lbl">Davr Kirimi</div>
-          <div class="p-val" style="color: var(--cyan-neon);" id="periodInc">+0 UZS</div>
+      <!-- Bugungi Sarf-xarajat Ko'rsatkichi -->
+      <div class="today-highlight">
+        <div class="today-title">🔥 Bugungi umumiy xarajat:</div>
+        <div class="today-sum" id="todayExpenseVal">-0 UZS</div>
+      </div>
+
+      <!-- Qarzlar hisoboti -->
+      <div class="debt-grid">
+        <div class="debt-card">
+          <div class="debt-lbl">🤝 Qaytarishlari kerak:</div>
+          <div class="debt-val" style="color: var(--cyan-neon);" id="debtGivenTotal">0 UZS</div>
         </div>
-        <div class="p-stat">
-          <div class="p-lbl">Davr Xarajati</div>
-          <div class="p-val" style="color: var(--danger);" id="periodExp">-0 UZS</div>
+        <div class="debt-card">
+          <div class="debt-lbl">⚠️ Qaytarishim kerak:</div>
+          <div class="debt-val" style="color: var(--warning);" id="debtTakenTotal">0 UZS</div>
         </div>
       </div>
     </div>
 
-    <!-- Tezkor Amallar -->
+    <!-- Tugmalar -->
     <div class="action-row">
-      <button class="btn-dashboard btn-cyan" onclick="openInput('income')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-        ＋ Kirim
-      </button>
-      <button class="btn-dashboard btn-dark" onclick="openInput('expense')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/></svg>
-        − Xarajat
-      </button>
+      <button class="btn-act btn-cyan" onclick="openInput('income')">＋ Kirim</button>
+      <button class="btn-act btn-dark" onclick="openInput('expense')">− Xarajat</button>
     </div>
 
-    <!-- Qaysi toifaga qancha ketdi (Breakdown) -->
+    <!-- Kunbay Tarix & Arxiv -->
     <div class="card-box">
       <div class="card-head">
-        <span class="head-title">Yo'nalishlar Bo'yicha Xarajat</span>
-        <span class="head-link" id="periodDetailLink">Shu oy tahlili</span>
+        <span class="head-title">Kunbay Sarf-Xarajatlar</span>
+        <span style="font-size: 11px; color: var(--cyan-neon); font-weight: 700;" id="daySumPreview">0 UZS</span>
       </div>
-      <div id="categoryBreakdownList">
-        <p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 10px;">Ushbu davrda xarajatlar yo'q</p>
-      </div>
-    </div>
 
-    <!-- Diagramma -->
-    <div class="card-box">
-      <div class="card-head">
-        <span class="head-title">Ulushlar Diagrammasi</span>
-        <span class="head-link">Foizlarda</span>
+      <div class="archive-tabs">
+        <div class="arc-chip active" onclick="setDayFilter('today')">Bugun</div>
+        <div class="arc-chip" onclick="setDayFilter('yesterday')">Kecha</div>
+        <div class="arc-chip" onclick="setDayFilter('before')">Avvalgi kunlar</div>
+        <div class="arc-chip" onclick="setDayFilter('all')">Hammasi</div>
       </div>
-      <div class="chart-wrapper">
-        <canvas id="financeChart"></canvas>
-      </div>
-    </div>
 
-    <!-- Tranzaksiyalar -->
-    <div class="card-box">
-      <div class="card-head">
-        <span class="head-title">Tanlangan Davr Tarixi</span>
-        <span class="head-link" onclick="clearAllData()">Tozalash</span>
-      </div>
-      <div id="txList">
-        <p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 12px;">Hozircha amallar yo'q</p>
+      <div id="dayTxList">
+        <p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 12px;">Ma'lumot topilmadi</p>
       </div>
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- Kiritish & Tahrirlash Modali -->
   <div class="modal-overlay" id="inputModal">
     <div class="modal-sheet">
       <h3 id="modalTitle" style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Amal Kiritish</h3>
       
-      <div class="chips-label">Summa (so'm):</div>
-      <input type="number" id="inAmt" class="input-box" placeholder="Masalan: 25000" inputmode="numeric">
+      <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 6px;">Summa:</div>
+      <input type="number" id="inAmt" class="input-box" placeholder="Summani kiriting" inputmode="numeric">
 
-      <div class="chips-label">Tezkor Toifalar:</div>
+      <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 6px;">Tezkor toifa:</div>
       <div class="chips-group" id="chipsContainer"></div>
 
-      <div class="chips-label">Izoh:</div>
-      <input type="text" id="inCat" class="input-box" placeholder="Masalan: Abet (Osh), Yandex Taksi, Elektr">
+      <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 6px;">Nomi / Izoh (kimga yoki nima uchun):</div>
+      <input type="text" id="inCat" class="input-box" placeholder="Masalan: Yandex, Abet, Ali qarz">
 
-      <button class="btn-dashboard btn-cyan" id="saveBtn" style="width: 100%; margin-top: 4px;" onclick="addRecord()">
+      <!-- Qarz bo'lsa eslatma sanasi -->
+      <div id="debtDueDateWrap" style="display: none;">
+        <div style="font-size: 11px; color: var(--warning); margin-bottom: 6px;">⏰ Qaytarish sanasi (Bot SMS eslatadi):</div>
+        <input type="date" id="inDueDate" class="input-box">
+      </div>
+
+      <button class="btn-act btn-cyan" id="saveBtn" style="width: 100%; margin-top: 4px;" onclick="saveRecord()">
         Tasdiqlash & Saqlash
       </button>
-      <button onclick="closeInput()" style="width: 100%; background: transparent; border: none; color: var(--text-dim); font-size: 13px; padding: 10px; margin-top: 4px; cursor: pointer;">
+      <button onclick="closeModal()" style="width: 100%; background: transparent; border: none; color: var(--text-dim); font-size: 13px; padding: 10px; margin-top: 4px; cursor: pointer;">
         Bekor qilish
       </button>
     </div>
@@ -567,11 +202,7 @@
 
   <script>
     const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-      try { tg.setHeaderColor('#060913'); } catch(e) {}
-    }
+    if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor('#060913'); } catch(e) {} }
 
     const ALLOWED_IDS = [7789172387, 8622259094];
     const userId = tg?.initDataUnsafe?.user?.id;
@@ -586,57 +217,45 @@
       document.getElementById('userPill').innerText = userName;
     }
 
-    // Har kungi eng kerakli toifalar
-    const EXPENSE_CATEGORIES = [
-      '🍽 Abet / Tushlik',
-      '🚕 Taksi',
-      '🛒 Oziq-ovqat / Bozor',
-      '💡 Kommunal / Uy',
-      '☕ Kafe / Fastfood',
-      '🤝 Qarz berdim',
-      '💸 Qarz qaytardim'
-    ];
+    const EXP_CATS = ['🍽 Abet / Tushlik', '🚕 Taksi', '🛒 Oziq-ovqat', '💡 Kommunal', '🤝 Qarz berdim', '💸 Qarz qaytardim'];
+    const INC_CATS = ['💼 Oylik Maosh', '🤝 Qarz oldim', '💵 Qarz qaytdi', '📈 Savdo / Foyda'];
 
-    const INCOME_CATEGORIES = [
-      '💼 Oylik Maosh',
-      '🤝 Qarz oldim',
-      '💵 Qarz qaytdi',
-      '📈 Foyda / Savdo'
-    ];
-
-    let records = JSON.parse(localStorage.getItem('moliya_data_v4') || '[]');
+    let records = JSON.parse(localStorage.getItem('moliya_data_v5') || '[]');
     let currentMode = 'expense';
-    let currentPeriod = 'month'; // 'today', 'week', 'month', 'all'
-    let chartObj = null;
+    let editId = null;
+    let selectedDayFilter = 'today';
 
-    function setPeriod(period) {
-      currentPeriod = period;
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    function setDayFilter(type) {
+      selectedDayFilter = type;
+      document.querySelectorAll('.arc-chip').forEach(el => el.classList.remove('active'));
       event.target.classList.add('active');
-
-      const labels = {
-        'today': 'Bugungi Sof Balans',
-        'week': 'Shu Haftalik Sof Balans',
-        'month': 'Shu Oylik Sof Balans',
-        'all': 'Umumiy Sof Balans'
-      };
-      document.getElementById('periodLabel').innerText = labels[period];
-      document.getElementById('periodDetailLink').innerText = event.target.innerText + ' tahlili';
-
-      renderAll();
-      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+      renderDayList();
     }
 
-    function openInput(mode) {
+    function openInput(mode, idToEdit = null) {
       currentMode = mode;
-      document.getElementById('modalTitle').innerText = mode === 'income' ? "Kirim Kiritish" : "Xarajat Kiritish";
-      
-      const chipsBox = document.getElementById('chipsContainer');
-      const cats = mode === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
-      chipsBox.innerHTML = cats.map(c => `<div class="chip-item" onclick="selectChip('${c}')">${c}</div>`).join('');
+      editId = idToEdit;
+      const title = document.getElementById('modalTitle');
+      const catsBox = document.getElementById('chipsContainer');
+      const cats = mode === 'income' ? INC_CATS : EXP_CATS;
 
-      document.getElementById('inAmt').value = '';
-      document.getElementById('inCat').value = '';
+      catsBox.innerHTML = cats.map(c => `<div class="chip-item" onclick="selectChip('${c}')">${c}</div>`).join('');
+
+      if (idToEdit) {
+        const item = records.find(r => r.id === idToEdit);
+        title.innerText = "Tahrirlash";
+        document.getElementById('inAmt').value = item.amount;
+        document.getElementById('inCat').value = item.category;
+        document.getElementById('inDueDate').value = item.dueDate || '';
+        toggleDebtDate(item.category);
+      } else {
+        title.innerText = mode === 'income' ? "Kirim Kiritish" : "Xarajat Kiritish";
+        document.getElementById('inAmt').value = '';
+        document.getElementById('inCat').value = '';
+        document.getElementById('inDueDate').value = '';
+        document.getElementById('debtDueDateWrap').style.display = 'none';
+      }
+
       document.getElementById('inputModal').style.display = 'flex';
       if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
     }
@@ -645,180 +264,156 @@
       document.getElementById('inCat').value = name;
       document.querySelectorAll('.chip-item').forEach(el => el.classList.remove('active'));
       event.target.classList.add('active');
+      toggleDebtDate(name);
     }
 
-    function closeInput() {
+    function toggleDebtDate(name) {
+      const wrap = document.getElementById('debtDueDateWrap');
+      if (name.includes('Qarz')) {
+        wrap.style.display = 'block';
+      } else {
+        wrap.style.display = 'none';
+      }
+    }
+
+    function closeModal() {
       document.getElementById('inputModal').style.display = 'none';
+      editId = null;
     }
 
-    function addRecord() {
+    function saveRecord() {
       const amt = parseFloat(document.getElementById('inAmt').value);
       const cat = document.getElementById('inCat').value.trim() || (currentMode === 'income' ? 'Kirim' : 'Xarajat');
+      const dueDate = document.getElementById('inDueDate').value;
 
       if (!amt || amt <= 0) return;
 
       const now = new Date();
-      records.unshift({
-        id: Date.now(),
-        type: currentMode,
-        amount: amt,
-        category: cat,
-        timestamp: now.getTime(),
-        date: now.toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' }),
-        time: now.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
-      });
+      if (editId) {
+        // Tahrirlash
+        const index = records.findIndex(r => r.id === editId);
+        if (index !== -1) {
+          records[index].amount = amt;
+          records[index].category = cat;
+          records[index].dueDate = dueDate;
+        }
+      } else {
+        // Yangi qo'shish
+        const newRecord = {
+          id: Date.now(),
+          type: currentMode,
+          amount: amt,
+          category: cat,
+          dueDate: dueDate || null,
+          timestamp: now.getTime(),
+          dateKey: now.toISOString().split('T')[0], // YYYY-MM-DD
+          date: now.toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' }),
+          time: now.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
+        };
+        records.unshift(newRecord);
 
-      localStorage.setItem('moliya_data_v4', JSON.stringify(records));
-      closeInput();
+        // Agar qarz eslatmasi bo'lsa bot serveriga jo'natish
+        if (dueDate && tg) {
+          tg.sendData(JSON.stringify({
+            action: "set_debt_reminder",
+            title: cat,
+            amount: amt,
+            dueDate: dueDate
+          }));
+        }
+      }
+
+      localStorage.setItem('moliya_data_v5', JSON.stringify(records));
+      closeModal();
       renderAll();
       if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
     }
 
-    function clearAllData() {
-      if (confirm("Barcha amallar o'chirilsinmi?")) {
-        records = [];
-        localStorage.removeItem('moliya_data_v4');
+    function deleteRecord(id) {
+      if (confirm("Ushbu yozuv o'chirilsinmi?")) {
+        records = records.filter(r => r.id !== id);
+        localStorage.setItem('moliya_data_v5', JSON.stringify(records));
         renderAll();
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
       }
-    }
-
-    // Tanlangan vaqt oralig'idagi yozuvlarni ajratib olish
-    function filterRecordsByPeriod(allRecords, period) {
-      if (period === 'all') return allRecords;
-
-      const now = new Date();
-      const nowTime = now.getTime();
-
-      return allRecords.filter(r => {
-        const rTime = r.timestamp || r.id; // agar eski yozuv bo'lsa id vaqt hisoblanadi
-        const diffMs = nowTime - rTime;
-        const diffDays = diffMs / (1000 * 60 * 60 * 24);
-
-        if (period === 'today') {
-          const recDate = new Date(rTime);
-          return recDate.toDateString() === now.toDateString();
-        } else if (period === 'week') {
-          return diffDays <= 7;
-        } else if (period === 'month') {
-          return diffDays <= 30;
-        }
-        return true;
-      });
     }
 
     function renderAll() {
-      const currentList = filterRecordsByPeriod(records, currentPeriod);
+      let incomeSum = 0;
+      let expenseSum = 0;
+      let debtGiven = 0;
+      let debtTaken = 0;
+      let todayExpense = 0;
 
-      let incSum = 0;
-      let expSum = 0;
-      const catStats = {};
+      const todayStr = new Date().toISOString().split('T')[0];
 
-      currentList.forEach(r => {
+      records.forEach(r => {
         if (r.type === 'income') {
-          incSum += r.amount;
+          incomeSum += r.amount;
         } else {
-          expSum += r.amount;
-          catStats[r.category] = (catStats[r.category] || 0) + r.amount;
+          expenseSum += r.amount;
+          if (r.dateKey === todayStr) {
+            todayExpense += r.amount;
+          }
         }
+
+        if (r.category.includes('Qarz berdim')) debtGiven += r.amount;
+        if (r.category.includes('Qarz qaytdi')) debtGiven -= r.amount;
+        if (r.category.includes('Qarz oldim')) debtTaken += r.amount;
+        if (r.category.includes('Qarz qaytardim')) debtTaken -= r.amount;
       });
 
-      const netBalance = incSum - expSum;
+      document.getElementById('totalBalanceVal').innerHTML = `${(incomeSum - expenseSum).toLocaleString()} <span>UZS</span>`;
+      document.getElementById('todayExpenseVal').innerText = `-${todayExpense.toLocaleString()} UZS`;
+      document.getElementById('debtGivenTotal').innerText = `${Math.max(0, debtGiven).toLocaleString()} UZS`;
+      document.getElementById('debtTakenTotal').innerText = `${Math.max(0, debtTaken).toLocaleString()} UZS`;
 
-      document.getElementById('totalBalanceVal').innerHTML = `${netBalance.toLocaleString()} <span>UZS</span>`;
-      document.getElementById('periodInc').innerText = `+${incSum.toLocaleString()} UZS`;
-      document.getElementById('periodExp').innerText = `-${expSum.toLocaleString()} UZS`;
+      renderDayList();
+    }
 
-      // 1 oy davomida qaysi narsaga qancha ketganini foizi va summasi bilan ko'rsatish (Breakdown)
-      const breakdownBox = document.getElementById('categoryBreakdownList');
-      const catKeys = Object.keys(catStats);
+    function renderDayList() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const yestDate = new Date(); yestDate.setDate(yestDate.getDate() - 1);
+      const yesterdayStr = yestDate.toISOString().split('T')[0];
 
-      if (catKeys.length === 0) {
-        breakdownBox.innerHTML = `<p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 10px;">Ushbu davrda xarajatlar yo'q</p>`;
+      let filtered = [];
+      if (selectedDayFilter === 'today') {
+        filtered = records.filter(r => r.dateKey === todayStr);
+      } else if (selectedDayFilter === 'yesterday') {
+        filtered = records.filter(r => r.dateKey === yesterdayStr);
+      } else if (selectedDayFilter === 'before') {
+        filtered = records.filter(r => r.dateKey !== todayStr && r.dateKey !== yesterdayStr);
       } else {
-        // Xarajat ko'pligi bo'yicha saralash
-        catKeys.sort((a, b) => catStats[b] - catStats[a]);
-
-        breakdownBox.innerHTML = catKeys.map(cat => {
-          const sum = catStats[cat];
-          const pct = expSum > 0 ? Math.round((sum / expSum) * 100) : 0;
-          return `
-            <div class="cat-bar-item">
-              <div class="cat-info-row">
-                <span class="cat-title-text">${cat} <span style="color: var(--text-dim); font-size: 11px;">(${pct}%)</span></span>
-                <span class="cat-amount-text">-${sum.toLocaleString()} UZS</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: ${pct}%;"></div>
-              </div>
-            </div>
-          `;
-        }).join('');
+        filtered = records;
       }
 
-      // Oxirgi tranzaksiyalar
-      const listEl = document.getElementById('txList');
-      if (currentList.length === 0) {
-        listEl.innerHTML = `<p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 12px;">Hozircha amallar yo'q</p>`;
+      let subTotalExp = 0;
+      filtered.forEach(r => { if (r.type === 'expense') subTotalExp += r.amount; });
+      document.getElementById('daySumPreview').innerText = `Xarajat: -${subTotalExp.toLocaleString()} UZS`;
+
+      const listEl = document.getElementById('dayTxList');
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 12px;">Hech qanday amal kiritilmagan</p>`;
       } else {
-        listEl.innerHTML = currentList.slice(0, 10).map(r => `
+        listEl.innerHTML = filtered.map(r => `
           <div class="tx-row">
             <div class="tx-left">
               <div class="tx-icon-pill">${r.type === 'income' ? '⚡' : '💸'}</div>
               <div>
                 <div class="tx-name">${r.category}</div>
-                <div class="tx-date">${r.date} • ${r.time || ''}</div>
+                <div class="tx-date">${r.date} ${r.time} ${r.dueDate ? '• ⏰ Qaytish: ' + r.dueDate : ''}</div>
               </div>
             </div>
-            <div class="tx-amt" style="color: ${r.type === 'income' ? 'var(--cyan-neon)' : 'var(--danger)'}">
-              ${r.type === 'income' ? '+' : '-'}${r.amount.toLocaleString()} UZS
+            <div class="tx-right">
+              <div class="tx-amt" style="color: ${r.type === 'income' ? 'var(--cyan-neon)' : 'var(--danger)'}">
+                ${r.type === 'income' ? '+' : '-'}${r.amount.toLocaleString()}
+              </div>
+              <button class="btn-icon" onclick="openInput('${r.type}', ${r.id})">✏️</button>
+              <button class="btn-icon btn-del" onclick="deleteRecord(${r.id})">🗑</button>
             </div>
           </div>
         `).join('');
       }
-
-      renderChart(catStats);
-    }
-
-    function renderChart(catStats) {
-      const labels = Object.keys(catStats);
-      const data = Object.values(catStats);
-
-      if (chartObj) chartObj.destroy();
-
-      const canvas = document.getElementById('financeChart');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-
-      chartObj = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: labels.length ? labels : ['Xarajat yo\'q'],
-          datasets: [{
-            data: data.length ? data : [1],
-            backgroundColor: labels.length 
-              ? ['#2dd4bf', '#38bdf8', '#0284c7', '#fbbf24', '#f43f5e', '#a855f7', '#64748b']
-              : ['rgba(255, 255, 255, 0.05)'],
-            borderWidth: 0,
-            hoverOffset: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '72%',
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: { 
-                color: '#94a3b8', 
-                font: { size: 11, family: "'Plus Jakarta Sans', sans-serif", weight: '600' },
-                padding: 10,
-                boxWidth: 8
-              }
-            }
-          }
-        }
-      });
     }
 
     renderAll();
