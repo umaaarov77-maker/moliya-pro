@@ -3,25 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Moliya Pro — Shaxsiy Kapital Nazorati</title>
-  <!-- Telegram WebApp SDK -->
+  <title>Moliya Pro</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- Chart.js & Google Fonts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --bg: #07090e;
-      --card-bg: rgba(18, 23, 38, 0.72);
+      --card-bg: rgba(18, 23, 38, 0.75);
       --card-border: rgba(255, 255, 255, 0.08);
-      --card-glow: rgba(56, 189, 248, 0.08);
       --text: #f8fafc;
       --text-muted: #94a3b8;
-      --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #3b82f6 50%, #6366f1 100%);
-      --income-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      --expense-gradient: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+      --accent: linear-gradient(135deg, #38bdf8 0%, #3b82f6 50%, #6366f1 100%);
       --income: #10b981;
       --expense: #f43f5e;
       --font-mono: 'JetBrains Mono', monospace;
@@ -31,9 +26,8 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       -webkit-tap-highlight-color: transparent;
-      user-select: none;
     }
 
     body {
@@ -43,19 +37,19 @@
         radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.1) 0px, transparent 50%);
       color: var(--text);
       min-height: 100vh;
-      padding: 16px 16px 85px;
+      padding: 16px;
       overflow-x: hidden;
     }
 
-    /* Bloklangan ekran */
+    /* Ruxsat berilmagan holat */
     #blockedScreen {
       display: none;
-      height: 85vh;
+      min-height: 80vh;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 24px;
+      padding: 20px;
     }
 
     .lock-circle {
@@ -67,249 +61,138 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 30px rgba(244, 63, 94, 0.2);
+      font-size: 34px;
+      margin-bottom: 16px;
     }
 
-    /* Asosiy interfeys */
+    /* Asosiy panel */
     #appContent {
-      display: none;
-      animation: fadeIn 0.4s ease-out;
+      display: block;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Header */
     .header-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
-    .user-pill {
+    .user-badge {
       display: flex;
       align-items: center;
       gap: 10px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--card-border);
-      padding: 6px 14px 6px 8px;
+      padding: 6px 14px;
       border-radius: 100px;
-      backdrop-filter: blur(10px);
-    }
-
-    .user-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--accent-gradient);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 13px;
-    }
-
-    .user-name {
       font-size: 13px;
       font-weight: 600;
-      color: #e2e8f0;
     }
 
-    .badge-secure {
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 100px;
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      font-weight: 600;
-      letter-spacing: 0.3px;
-    }
-
-    /* Premium Balans Kartasi */
-    .hero-card {
-      position: relative;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 26px;
-      padding: 24px 20px;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      overflow: hidden;
-      margin-bottom: 18px;
-    }
-
-    .hero-card::before {
-      content: '';
-      position: absolute;
-      top: -60px;
-      right: -60px;
-      width: 140px;
-      height: 140px;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .balance-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .balance-subtitle {
-      font-size: 12px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 600;
-    }
-
-    .eye-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .balance-val {
-      font-size: 34px;
-      font-weight: 800;
-      margin: 10px 0 20px;
-      letter-spacing: -0.5px;
-      font-family: var(--font-mono);
-      display: flex;
-      align-items: baseline;
-      gap: 6px;
-    }
-
-    .balance-val span {
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--text-muted);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    .stats-split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      padding-top: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.07);
-    }
-
-    .stat-pill {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      padding: 10px 14px;
-    }
-
-    .stat-pill .tag {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .tag-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-    }
-
-    .stat-pill .num {
-      font-size: 16px;
-      font-weight: 700;
-      font-family: var(--font-mono);
-    }
-
-    /* Tugmalar */
-    .quick-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 22px;
-    }
-
-    .action-btn {
-      border: none;
-      padding: 15px;
-      border-radius: 18px;
-      font-size: 15px;
-      font-weight: 700;
-      color: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 10px 20px -6px rgba(0, 0, 0, 0.3);
-      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .action-btn:active {
-      transform: scale(0.96);
-    }
-
-    .btn-inc {
-      background: var(--income-gradient);
-      box-shadow: 0 10px 20px -6px rgba(16, 185, 129, 0.35);
-    }
-
-    .btn-exp {
-      background: var(--expense-gradient);
-      box-shadow: 0 10px 20px -6px rgba(244, 63, 94, 0.35);
-    }
-
-    /* Kartalar bloki */
-    .section-card {
+    .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 22px;
       padding: 20px;
-      margin-bottom: 18px;
-      backdrop-filter: blur(16px);
-    }
-
-    .card-title {
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.2px;
       margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
     }
 
-    .card-title .hint {
+    .bal-title {
       font-size: 12px;
-      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 600;
+    }
+
+    .bal-sum {
+      font-size: 32px;
+      font-weight: 800;
+      margin: 8px 0 16px;
+      font-family: var(--font-mono);
+      letter-spacing: -0.5px;
+    }
+
+    .bal-sum span {
+      font-size: 18px;
+      color: var(--text-muted);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 14px;
+    }
+
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      padding: 10px 12px;
+      border-radius: 14px;
+    }
+
+    .stat-lbl {
+      font-size: 11px;
       color: var(--text-muted);
     }
 
-    .chart-box {
-      position: relative;
-      width: 100%;
-      height: 230px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .stat-val {
+      font-size: 15px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      margin-top: 4px;
     }
 
-    /* Amaliyotlar ro'yxati */
+    .inc-text { color: var(--income); }
+    .exp-text { color: var(--expense); }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .act-btn {
+      border: none;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .act-btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-inc {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .btn-exp {
+      background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 200px;
+      width: 100%;
+      margin: 10px 0;
+    }
+
     .tx-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 13px 0;
+      padding: 12px 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
@@ -317,236 +200,126 @@
       border-bottom: none;
     }
 
-    .tx-icon-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .tx-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 17px;
-    }
-
-    .tx-cat-name {
+    .tx-name {
       font-size: 14px;
       font-weight: 600;
     }
 
-    .tx-meta {
-      font-size: 12px;
+    .tx-date {
+      font-size: 11px;
       color: var(--text-muted);
       margin-top: 2px;
     }
 
-    .tx-amount {
+    .tx-amt {
       font-family: var(--font-mono);
       font-size: 15px;
       font-weight: 700;
-      text-align: right;
     }
 
-    /* Bottom Sheet Modal */
-    .modal-overlay {
+    /* Modal */
+    .modal {
+      display: none;
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(8px);
       z-index: 1000;
-      display: none;
       align-items: flex-end;
     }
 
-    .bottom-sheet {
+    .modal-box {
       background: #0f1422;
       border-top: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 28px 28px 0 0;
+      border-radius: 24px 24px 0 0;
       width: 100%;
-      padding: 24px 20px 34px;
-      animation: sheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes sheetUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-
-    .sheet-pill {
-      width: 44px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      margin: 0 auto 18px;
-    }
-
-    .input-grp {
-      margin-bottom: 14px;
-    }
-
-    .input-grp label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      padding: 22px 18px 30px;
     }
 
     .custom-input {
       width: 100%;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      padding: 14px 16px;
+      border-radius: 12px;
+      padding: 12px 14px;
       color: #fff;
       font-size: 16px;
       outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .custom-input:focus {
-      border-color: #38bdf8;
-    }
-
-    .chips-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .chip {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .chip.active {
-      background: var(--accent-gradient);
-      border-color: transparent;
+      margin-bottom: 12px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Begonalar uchun Qulflangan Ekran -->
+  <!-- Begonalar uchun Blok oynasi -->
   <div id="blockedScreen">
-    <div class="lock-circle">🔐</div>
-    <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 8px;">Maxfiy Tizim</h2>
-    <p style="color: var(--text-muted); font-size: 14px; line-height: 1.5; max-width: 280px;">
-      Bu moliyaviy tizim faqat ruxsat etilgan 2 ta akkaunt (ID) uchun yopiq rejimda himoyalangan.
+    <div class="lock-circle">🔒</div>
+    <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 8px;">Kirish Cheklangan</h3>
+    <p style="color: var(--text-muted); font-size: 13px; max-width: 260px;">
+      Bu moliyaviy tizim faqat ruxsat berilgan 2 ta maxsus hisob egasi uchun yopiq rejimda ishlaydi.
     </p>
   </div>
 
-  <!-- Asosiy Premium UI -->
+  <!-- Asosiy UI -->
   <div id="appContent">
-    <!-- Top Bar -->
     <div class="header-bar">
-      <div class="user-pill">
-        <div class="user-avatar" id="avatarLetter">U</div>
-        <div class="user-name" id="profileName">Foydalanuvchi</div>
+      <div class="user-badge" id="userPill">
+        <span>👤</span>
+        <span id="userNameTxt">Foydalanuvchi</span>
       </div>
-      <div class="badge-secure">● Shaxsiy Pro</div>
+      <div style="font-size: 11px; color: #34d399; font-weight: 700; background: rgba(16, 185, 129, 0.12); padding: 5px 10px; border-radius: 100px; border: 1px solid rgba(16, 185, 129, 0.3);">
+        ● Moliya Pro
+      </div>
     </div>
 
-    <!-- Asosiy Balans -->
-    <div class="hero-card">
-      <div class="balance-header">
-        <div class="balance-subtitle">Sof Kapital (Balans)</div>
-        <button class="eye-btn" onclick="toggleBalance()">👁️</button>
-      </div>
-      <div class="balance-val" id="balanceAmount">0 <span>UZS</span></div>
+    <div class="card">
+      <div class="bal-title">Sof Balans</div>
+      <div class="bal-sum" id="totalBalanceVal">0 <span>UZS</span></div>
 
-      <div class="stats-split">
+      <div class="stats-row">
         <div class="stat-pill">
-          <div class="tag">
-            <span class="tag-dot" style="background: var(--income);"></span> Oylik Kirim
-          </div>
-          <div class="num" style="color: var(--income);" id="totalInc">+0 UZS</div>
+          <div class="stat-lbl">Umumiy Kirim</div>
+          <div class="stat-val inc-text" id="incTotalVal">+0 UZS</div>
         </div>
         <div class="stat-pill">
-          <div class="tag">
-            <span class="tag-dot" style="background: var(--expense);"></span> Oylik Chiqim
-          </div>
-          <div class="num" style="color: var(--expense);" id="totalExp">-0 UZS</div>
+          <div class="stat-lbl">Umumiy Chiqim</div>
+          <div class="stat-val exp-text" id="expTotalVal">-0 UZS</div>
         </div>
       </div>
     </div>
 
-    <!-- Tezkor Amallar -->
-    <div class="quick-actions">
-      <button class="action-btn btn-inc" onclick="openModal('income')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-        Kirim qo'shish
-      </button>
-      <button class="action-btn btn-exp" onclick="openModal('expense')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/></svg>
-        Xarajat yozish
-      </button>
+    <div class="actions-grid">
+      <button class="act-btn btn-inc" onclick="openInput('income')">＋ Kirim</button>
+      <button class="act-btn btn-exp" onclick="openInput('expense')">− Chiqim</button>
     </div>
 
-    <!-- Xarajatlar Tahlili (Chart) -->
-    <div class="section-card">
-      <div class="card-title">
-        <span>Xarajatlar Tahlili</span>
-        <span class="hint">Kategoriyalar</span>
-      </div>
-      <div class="chart-box">
-        <canvas id="categoryChart"></canvas>
+    <div class="card">
+      <div class="bal-title" style="margin-bottom: 8px;">Xarajatlar Diagrammasi</div>
+      <div class="chart-container">
+        <canvas id="financeChart"></canvas>
       </div>
     </div>
 
-    <!-- Oxirgi Tranzaksiyalar -->
-    <div class="section-card">
-      <div class="card-title">
-        <span>Oxirgi Tranzaksiyalar</span>
-        <span class="hint" style="cursor: pointer; color: #38bdf8;" onclick="clearHistory()">Tozalash</span>
+    <div class="card">
+      <div class="bal-title" style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+        <span>So'nggi Amaliyotlar</span>
+        <span style="color: #38bdf8; cursor: pointer; text-transform: none;" onclick="clearAllData()">Tozalash</span>
       </div>
-      <div id="txListContainer">
-        <p style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 16px;">Hozircha ma'lumotlar yo'q</p>
+      <div id="txList">
+        <p style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 12px;">Hozircha amaliyotlar yo'q</p>
       </div>
     </div>
   </div>
 
-  <!-- Bottom Sheet Kiritish Modali -->
-  <div class="modal-overlay" id="actionModal">
-    <div class="bottom-sheet">
-      <div class="sheet-pill"></div>
-      <h3 id="modalHead" style="font-size: 18px; font-weight: 800; margin-bottom: 16px;">Yangi Amaliyot</h3>
-
-      <div class="input-grp">
-        <label>Summa (so'm)</label>
-        <input type="number" id="inputAmount" class="custom-input" placeholder="Masalan: 150000" inputmode="numeric">
-      </div>
-
-      <div class="input-grp">
-        <label>Tezkor Kategoriyalar</label>
-        <div class="chips-grid" id="categoryChips"></div>
-      </div>
-
-      <div class="input-grp">
-        <label>Yoki o'zingiz yozing</label>
-        <input type="text" id="inputCategory" class="custom-input" placeholder="Izoh yoki toifa">
-      </div>
-
-      <button class="action-btn btn-inc" id="saveBtn" style="width: 100%; margin-top: 12px;" onclick="confirmSave()">
-        Tasdiqlash & Saqlash
-      </button>
-      <button onclick="closeModal()" style="width: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 14px; font-weight: 600; padding: 12px; margin-top: 4px; cursor: pointer;">
-        Bekor qilish
-      </button>
+  <!-- Kiritish modali -->
+  <div class="modal" id="inputModal">
+    <div class="modal-box">
+      <h3 id="modalTitle" style="font-size: 17px; font-weight: 700; margin-bottom: 14px;">Amal kiritish</h3>
+      <input type="number" id="inAmt" class="custom-input" placeholder="Summa (masalan: 50000)" inputmode="numeric">
+      <input type="text" id="inCat" class="custom-input" placeholder="Kategoriya (masalan: Bozor, Transport)">
+      
+      <button class="act-btn btn-inc" id="saveBtn" style="width: 100%; margin-top: 4px;" onclick="addRecord()">Saqlash</button>
+      <button onclick="closeInput()" style="width: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 14px; padding: 12px; margin-top: 4px; cursor: pointer;">Bekor qilish</button>
     </div>
   </div>
 
@@ -558,100 +331,69 @@
       try { tg.setHeaderColor('#07090e'); } catch(e) {}
     }
 
-    // Faqat ruxsat etilgan 2 ta maxsus ID
-    const WHITELIST_IDS = [7789172387, 8622259094];
-
-    // Tekshirish
+    // Faqat ruxsat etilgan 2 ta ID
+    const ALLOWED_IDS = [7789172387, 8622259094];
     const userId = tg?.initDataUnsafe?.user?.id;
     const userName = tg?.initDataUnsafe?.user?.first_name || "Moliya";
 
-    if (userId && WHITELIST_IDS.includes(userId)) {
-      document.getElementById('appContent').style.display = 'block';
-      document.getElementById('blockedScreen').style.display = 'none';
-      document.getElementById('profileName').innerText = userName;
-      document.getElementById('avatarLetter').innerText = userName.charAt(0).toUpperCase();
-    } else {
+    // Agar begona Telegram ID bo'lsa darhol bloklash
+    if (userId && !ALLOWED_IDS.includes(userId)) {
       document.getElementById('appContent').style.display = 'none';
       document.getElementById('blockedScreen').style.display = 'flex';
+    } else {
+      document.getElementById('appContent').style.display = 'block';
+      document.getElementById('blockedScreen').style.display = 'none';
+      document.getElementById('userNameTxt').innerText = userName;
     }
 
-    let records = JSON.parse(localStorage.getItem('moliya_pro_records') || '[]');
+    let records = JSON.parse(localStorage.getItem('moliya_data_v2') || '[]');
     let currentMode = 'expense';
-    let balanceVisible = true;
-    let chartInstance = null;
+    let chartObj = null;
 
-    const expenseCategories = ['🍽 Oziq-ovqat', '🚕 Transport', '🛍 Bozor / Xarid', '🏠 Uy / Ijara', '💡 Kommunal', '💻 Server / Tech'];
-    const incomeCategories = ['💼 Oylik Maosh', '📈 Trading / Foyda', '🤝 Freelance', '🎁 Sovg'a / Boshqa'];
-
-    function toggleBalance() {
-      balanceVisible = !balanceVisible;
-      renderData();
-    }
-
-    function openModal(mode) {
+    function openInput(mode) {
       currentMode = mode;
-      document.getElementById('modalHead').innerText = mode === 'income' ? "Kirim Kiritish" : "Xarajat Kiritish";
-      const saveBtn = document.getElementById('saveBtn');
-      if (mode === 'income') {
-        saveBtn.className = "action-btn btn-inc";
-      } else {
-        saveBtn.className = "action-btn btn-exp";
-      }
-
-      // Kategoriya chipslari
-      const chips = mode === 'income' ? incomeCategories : expenseCategories;
-      const chipsBox = document.getElementById('categoryChips');
-      chipsBox.innerHTML = chips.map(c => `<div class="chip" onclick="selectChip('${c}')">${c}</div>`).join('');
-
-      document.getElementById('inputAmount').value = '';
-      document.getElementById('inputCategory').value = '';
-      document.getElementById('actionModal').style.display = 'flex';
+      document.getElementById('modalTitle').innerText = mode === 'income' ? "Kirim qo'shish" : "Chiqim qo'shish";
+      const btn = document.getElementById('saveBtn');
+      btn.className = mode === 'income' ? 'act-btn btn-inc' : 'act-btn btn-exp';
+      document.getElementById('inAmt').value = '';
+      document.getElementById('inCat').value = '';
+      document.getElementById('inputModal').style.display = 'flex';
       if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
     }
 
-    function selectChip(text) {
-      document.getElementById('inputCategory').value = text;
-      document.querySelectorAll('.chip').forEach(el => el.classList.remove('active'));
-      event.target.classList.add('active');
+    function closeInput() {
+      document.getElementById('inputModal').style.display = 'none';
     }
 
-    function closeModal() {
-      document.getElementById('actionModal').style.display = 'none';
-    }
+    function addRecord() {
+      const amt = parseFloat(document.getElementById('inAmt').value);
+      const cat = document.getElementById('inCat').value.trim() || (currentMode === 'income' ? 'Kirim' : 'Xarajat');
 
-    function confirmSave() {
-      const amt = parseFloat(document.getElementById('inputAmount').value);
-      const cat = document.getElementById('inputCategory').value.trim() || (currentMode === 'income' ? 'Kirim' : 'Xarajat');
-
-      if (!amt || amt <= 0) {
-        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-        return;
-      }
+      if (!amt || amt <= 0) return;
 
       records.unshift({
         id: Date.now(),
         type: currentMode,
         amount: amt,
         category: cat,
-        date: new Date().toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' }),
-        time: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
+        date: new Date().toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' })
       });
 
-      localStorage.setItem('moliya_pro_records', JSON.stringify(records));
-      closeModal();
-      renderData();
+      localStorage.setItem('moliya_data_v2', JSON.stringify(records));
+      closeInput();
+      renderAll();
       if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
     }
 
-    function clearHistory() {
-      if (confirm("Barcha yozuvlarni tozalashni xohlaysizmi?")) {
+    function clearAllData() {
+      if (confirm("Hamma yozuvlar o'chirilsinmi?")) {
         records = [];
-        localStorage.removeItem('moliya_pro_records');
-        renderData();
+        localStorage.removeItem('moliya_data_v2');
+        renderAll();
       }
     }
 
-    function renderData() {
+    function renderAll() {
       let incomeSum = 0;
       let expenseSum = 0;
       const catStats = {};
@@ -667,81 +409,66 @@
 
       const netBalance = incomeSum - expenseSum;
 
-      // Balansni formatlash
-      if (balanceVisible) {
-        document.getElementById('balanceAmount').innerHTML = `${netBalance.toLocaleString()} <span>UZS</span>`;
-      } else {
-        document.getElementById('balanceAmount').innerHTML = `•••••••• <span>UZS</span>`;
-      }
+      document.getElementById('totalBalanceVal').innerHTML = `${netBalance.toLocaleString()} <span>UZS</span>`;
+      document.getElementById('incTotalVal').innerText = `+${incomeSum.toLocaleString()} UZS`;
+      document.getElementById('expTotalVal').innerText = `-${expenseSum.toLocaleString()} UZS`;
 
-      document.getElementById('totalInc').innerText = `+${incomeSum.toLocaleString()} UZS`;
-      document.getElementById('totalExp').innerText = `-${expenseSum.toLocaleString()} UZS`;
-
-      // Tranzaksiyalar
-      const listContainer = document.getElementById('txListContainer');
+      const listEl = document.getElementById('txList');
       if (records.length === 0) {
-        listContainer.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 16px;">Hozircha amaliyotlar yo'q</p>`;
+        listEl.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 12px;">Hozircha amaliyotlar yo'q</p>`;
       } else {
-        listContainer.innerHTML = records.slice(0, 10).map(item => `
+        listEl.innerHTML = records.slice(0, 8).map(r => `
           <div class="tx-item">
-            <div class="tx-icon-title">
-              <div class="tx-icon">${item.type === 'income' ? '💰' : '💳'}</div>
-              <div>
-                <div class="tx-cat-name">${item.category}</div>
-                <div class="tx-meta">${item.date} • ${item.time}</div>
-              </div>
+            <div>
+              <div class="tx-name">${r.category}</div>
+              <div class="tx-date">${r.date}</div>
             </div>
-            <div class="tx-amount" style="color: ${item.type === 'income' ? 'var(--income)' : 'var(--expense)'}">
-              ${item.type === 'income' ? '+' : '-'}${item.amount.toLocaleString()} UZS
+            <div class="tx-amt" style="color: ${r.type === 'income' ? 'var(--income)' : 'var(--expense)'}">
+              ${r.type === 'income' ? '+' : '-'}${r.amount.toLocaleString()} UZS
             </div>
           </div>
         `).join('');
       }
 
-      // Grafikni qayta chizish
-      drawChart(catStats);
+      renderChart(catStats);
     }
 
-    function drawChart(catStats) {
+    function renderChart(catStats) {
       const labels = Object.keys(catStats);
       const data = Object.values(catStats);
 
-      if (chartInstance) chartInstance.destroy();
+      if (chartObj) chartObj.destroy();
 
-      const ctx = document.getElementById('categoryChart').getContext('2d');
-      chartInstance = new Chart(ctx, {
+      const canvas = document.getElementById('financeChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      chartObj = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: labels.length ? labels : ['Xarajat yo'q'],
+          labels: labels.length ? labels : ['Xarajat yo\'q'],
           datasets: [{
             data: data.length ? data : [1],
             backgroundColor: labels.length 
               ? ['#f43f5e', '#38bdf8', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899', '#64748b']
               : ['rgba(255, 255, 255, 0.08)'],
-            borderWidth: 0,
-            hoverOffset: 6
+            borderWidth: 0
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          cutout: '72%',
           plugins: {
             legend: {
               position: 'bottom',
-              labels: {
-                color: '#94a3b8',
-                padding: 12,
-                boxWidth: 10,
-                font: { size: 11, family: "'Plus Jakarta Sans', sans-serif", weight: '600' }
-              }
+              labels: { color: '#94a3b8', font: { size: 11, family: "'Plus Jakarta Sans', sans-serif" } }
             }
           }
         }
       });
     }
 
-    renderData();
+    renderAll();
   </script>
 </body>
 </html>
