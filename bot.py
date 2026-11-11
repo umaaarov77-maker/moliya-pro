@@ -11,7 +11,7 @@ BOT_TOKEN = "8824955083:AAF5Vvs-ihI026VbVX698NzIZM5g9TFaMk8"
 ALLOWED_IDS = {7789172387, 8622259094}
 
 # GitHub Pages yoki Vercel linki
-WEB_APP_URL = "https://your-username.github.io/moliya-pro"
+WEB_APP_URL = "https://umaaarov77-maker.github.io/moliya-pro/"
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=BOT_TOKEN)
