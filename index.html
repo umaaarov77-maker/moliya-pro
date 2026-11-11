@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Moliya Pro Ultimate</title>
+  <title>Moliya Pro Glass</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,94 +12,170 @@
   <style>
     :root {
       --bg-base: #060913;
-      --card-surface: rgba(13, 20, 36, 0.82);
-      --card-border: rgba(56, 189, 248, 0.12);
-      --card-border-glow: rgba(45, 212, 191, 0.3);
-      --text-main: #f1f5f9;
-      --text-dim: #64748b;
+      --card-surface: rgba(15, 23, 42, 0.65);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-glow: rgba(56, 189, 248, 0.35);
+      --text-main: #f8fafc;
+      --text-dim: #94a3b8;
       --cyan-neon: #2dd4bf;
       --cyan-bright: #38bdf8;
       --cyan-gradient: linear-gradient(135deg, #2dd4bf 0%, #06b6d4 50%, #3b82f6 100%);
-      --card-grad: linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.85) 100%);
+      --card-grad: linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%);
       --danger: #fb7185;
       --warning: #fbbf24;
       --font-mono: 'JetBrains Mono', monospace;
+      --glass-dock: rgba(11, 17, 32, 0.75);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body {
       background-color: var(--bg-base);
-      background-image: radial-gradient(ellipse at 15% 0%, rgba(45, 212, 191, 0.15) 0%, transparent 45%), radial-gradient(ellipse at 85% 10%, rgba(56, 189, 248, 0.12) 0%, transparent 50%);
-      color: var(--text-main); min-height: 100vh; padding: 16px 14px 50px;
+      background-image: 
+        radial-gradient(ellipse at 15% 0%, rgba(45, 212, 191, 0.15) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 10%, rgba(56, 189, 248, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, rgba(15, 23, 42, 0.8) 0%, transparent 60%);
+      color: var(--text-main); min-height: 100vh; padding: 16px 14px 105px;
     }
 
     #blockedScreen { display: none; min-height: 80vh; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-    #appContent { display: block; animation: fadeIn 0.3s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-    .dash-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    /* Sahifalar (Tab views) */
+    .view-screen { display: none; animation: fadeIn 0.25s ease; }
+    .view-screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .dash-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .dash-title { font-size: 20px; font-weight: 800; background: linear-gradient(180deg, #fff 30%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .top-badge { display: flex; align-items: center; gap: 6px; padding: 5px 12px; background: rgba(45, 212, 191, 0.08); border: 1px solid var(--card-border-glow); border-radius: 100px; font-size: 11px; font-weight: 700; color: var(--cyan-neon); }
 
-    /* Asosiy Balans & Bugungi Sarf */
+    /* Karta dizaynlari */
     .hero-panel {
-      position: relative; background: var(--card-grad); border: 1px solid var(--card-border); border-radius: 22px; padding: 18px 16px;
-      backdrop-filter: blur(20px); margin-bottom: 14px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      position: relative; background: var(--card-grad); border: 1px solid var(--card-border); border-radius: 24px; padding: 20px 18px;
+      backdrop-filter: blur(20px); margin-bottom: 14px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
     }
-    .balance-display { font-size: 28px; font-weight: 800; font-family: var(--font-mono); color: #fff; margin: 6px 0 12px; }
-    .balance-display span { font-size: 14px; color: var(--cyan-neon); font-family: 'Plus Jakarta Sans', sans-serif; }
+    .balance-display { font-size: 30px; font-weight: 800; font-family: var(--font-mono); color: #fff; margin: 6px 0 14px; }
+    .balance-display span { font-size: 15px; color: var(--cyan-neon); font-family: 'Plus Jakarta Sans', sans-serif; }
 
     .today-highlight {
-      display: flex; justify-content: space-between; align-items: center; background: rgba(251, 113, 133, 0.08);
-      border: 1px solid rgba(251, 113, 133, 0.2); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center; background: rgba(251, 113, 133, 0.09);
+      border: 1px solid rgba(251, 113, 133, 0.22); border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
     }
-    .today-title { font-size: 12px; font-weight: 600; color: var(--danger); display: flex; align-items: center; gap: 6px; }
-    .today-sum { font-family: var(--font-mono); font-size: 15px; font-weight: 800; color: #fff; }
+    .today-title { font-size: 12px; font-weight: 600; color: var(--danger); }
+    .today-sum { font-family: var(--font-mono); font-size: 16px; font-weight: 800; color: #fff; }
 
-    .debt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 12px; }
-    .debt-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 8px 10px; }
-    .debt-lbl { font-size: 10px; color: var(--text-dim); font-weight: 600; margin-bottom: 3px; }
-    .debt-val { font-size: 13px; font-weight: 700; font-family: var(--font-mono); }
-
-    /* Tugmalar */
-    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
     .btn-act {
-      border: none; padding: 13px; border-radius: 14px; font-size: 13px; font-weight: 700; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
+      border: none; padding: 14px; border-radius: 16px; font-size: 13px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.15s;
     }
-    .btn-cyan { background: var(--cyan-gradient); color: #04101e; }
+    .btn-act:active { transform: scale(0.97); }
+    .btn-cyan { background: var(--cyan-gradient); color: #04101e; box-shadow: 0 10px 25px -5px rgba(45, 212, 191, 0.4); }
     .btn-dark { background: rgba(30, 41, 59, 0.7); color: #fff; border: 1px solid var(--card-border); }
 
-    .card-box { background: var(--card-surface); border: 1px solid var(--card-border); border-radius: 20px; padding: 16px; margin-bottom: 14px; backdrop-filter: blur(14px); }
+    .card-box {
+      background: var(--card-surface); border: 1px solid var(--card-border); border-radius: 22px; padding: 18px;
+      margin-bottom: 14px; backdrop-filter: blur(16px); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
     .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .head-title { font-size: 14px; font-weight: 700; }
 
-    /* Kunbay arxiv tablari */
-    .archive-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
-    .arc-chip {
-      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 12px; border-radius: 10px;
-      font-size: 11px; font-weight: 600; color: var(--text-dim); white-space: nowrap; cursor: pointer;
-    }
-    .arc-chip.active { background: var(--cyan-neon); color: #04101e; border-color: transparent; font-weight: 700; }
-
-    /* Amallar qatori va Tahrirlash/O'chirish */
-    .tx-row {
-      display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    }
+    /* Tranzaksiya qatori */
+    .tx-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
     .tx-row:last-child { border-bottom: none; }
     .tx-left { display: flex; align-items: center; gap: 10px; }
-    .tx-icon-pill { width: 34px; height: 34px; border-radius: 10px; background: rgba(45, 212, 191, 0.08); display: flex; align-items: center; justify-content: center; font-size: 15px; }
+    .tx-icon-pill { width: 36px; height: 36px; border-radius: 12px; background: rgba(45, 212, 191, 0.08); border: 1px solid rgba(45, 212, 191, 0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; }
     .tx-name { font-size: 13px; font-weight: 600; color: #e2e8f0; }
     .tx-date { font-size: 10px; color: var(--text-dim); }
     .tx-right { text-align: right; display: flex; align-items: center; gap: 8px; }
     .tx-amt { font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
-    
-    .btn-icon { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-dim); border-radius: 8px; padding: 5px 8px; font-size: 11px; cursor: pointer; }
+    .btn-icon { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-dim); border-radius: 8px; padding: 6px 9px; font-size: 11px; cursor: pointer; }
     .btn-del { color: var(--danger); border-color: rgba(251, 113, 133, 0.2); }
 
-    /* Modallar */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 1000; align-items: flex-end; }
-    .modal-sheet { background: #090e1a; border-top: 1px solid var(--card-border-glow); border-radius: 24px 24px 0 0; width: 100%; padding: 22px 18px 34px; max-height: 90vh; overflow-y: auto; }
+    /* Vaqt Filtrlari */
+    .filter-tabs { display: flex; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--card-border); border-radius: 12px; padding: 3px; gap: 3px; margin-bottom: 14px; }
+    .tab-btn { flex: 1; border: none; background: transparent; color: var(--text-dim); font-size: 11px; font-weight: 700; padding: 8px 4px; border-radius: 9px; cursor: pointer; }
+    .tab-btn.active { background: var(--cyan-neon); color: #04101e; box-shadow: 0 2px 10px rgba(45, 212, 191, 0.35); }
+
+    /* Kategoriya barlari */
+    .cat-bar-item { margin-bottom: 12px; }
+    .cat-info-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 4px; }
+    .cat-title-text { font-weight: 600; color: #e2e8f0; }
+    .cat-amount-text { font-family: var(--font-mono); font-weight: 700; color: var(--danger); }
+    .progress-track { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--cyan-neon); border-radius: 10px; transition: width 0.4s ease; }
+
+    /* Qarzlar grid */
+    .debt-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .debt-box { background: var(--card-surface); border: 1px solid var(--card-border); border-radius: 18px; padding: 14px; }
+    .debt-box-title { font-size: 11px; color: var(--text-dim); font-weight: 600; margin-bottom: 4px; }
+    .debt-box-val { font-size: 16px; font-weight: 800; font-family: var(--font-mono); }
+
+    /* Glassmorphism Bottom Dock Navigation */
+    .glass-dock-nav {
+      position: fixed;
+      bottom: 18px;
+      left: 16px;
+      right: 16px;
+      height: 66px;
+      background: var(--glass-dock);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 6px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      z-index: 999;
+    }
+
+    .dock-btn {
+      flex: 1;
+      height: 100%;
+      background: transparent;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: var(--text-dim);
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dock-btn .dock-icon {
+      font-size: 18px;
+      transition: transform 0.2s ease;
+    }
+
+    .dock-btn.active {
+      color: #fff;
+    }
+
+    .dock-btn.active .dock-icon {
+      transform: translateY(-2px);
+      filter: drop-shadow(0 0 10px rgba(45, 212, 191, 0.8));
+    }
+
+    .dock-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      width: 14px;
+      height: 3px;
+      border-radius: 6px;
+      background: var(--cyan-neon);
+      box-shadow: 0 0 10px var(--cyan-neon);
+    }
+
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); z-index: 1000; align-items: flex-end; }
+    .modal-sheet { background: #090e1a; border-top: 1px solid var(--card-border-glow); border-radius: 26px 26px 0 0; width: 100%; padding: 22px 18px 34px; max-height: 90vh; overflow-y: auto; }
     .input-box { width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 12px; color: #fff; font-size: 15px; outline: none; margin-bottom: 12px; }
     .chips-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
     .chip-item { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; color: #94a3b8; cursor: pointer; }
@@ -115,59 +191,132 @@
   <div id="appContent">
     <div class="dash-nav">
       <div>
-        <div class="dash-title">Moliya Pro</div>
-        <div style="font-size: 11px; color: var(--text-dim);">Xarajat, Kunbay Arxiv & Qarz Nazorati</div>
+        <div class="dash-title" id="screenHeaderTitle">Moliya Pro</div>
+        <div style="font-size: 11px; color: var(--text-dim);" id="screenHeaderSub">Shaxsiy Boshqaruv & Glassy UI</div>
       </div>
       <div class="top-badge" id="userPill">Live Pro</div>
     </div>
 
-    <!-- Asosiy Balans -->
-    <div class="hero-panel">
-      <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Sof Kapital</div>
-      <div class="balance-display" id="totalBalanceVal">0 <span>UZS</span></div>
+    <!-- 1-OYNA: ASOSIY DASHBOARD -->
+    <div id="screenDashboard" class="view-screen active">
+      <div class="hero-panel">
+        <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Sof Mablag'</div>
+        <div class="balance-display" id="totalBalanceVal">0 <span>UZS</span></div>
 
-      <!-- Bugungi Sarf-xarajat Ko'rsatkichi -->
-      <div class="today-highlight">
-        <div class="today-title">🔥 Bugungi umumiy xarajat:</div>
-        <div class="today-sum" id="todayExpenseVal">-0 UZS</div>
+        <div class="today-highlight">
+          <div class="today-title">🔥 Bugungi sarf:</div>
+          <div class="today-sum" id="todayExpenseVal">-0 UZS</div>
+        </div>
       </div>
 
-      <!-- Qarzlar hisoboti -->
-      <div class="debt-grid">
-        <div class="debt-card">
-          <div class="debt-lbl">🤝 Qaytarishlari kerak:</div>
-          <div class="debt-val" style="color: var(--cyan-neon);" id="debtGivenTotal">0 UZS</div>
+      <div class="action-row">
+        <button class="btn-act btn-cyan" onclick="openInput('income')">＋ Kirim</button>
+        <button class="btn-act btn-dark" onclick="openInput('expense')">− Chiqim</button>
+      </div>
+
+      <div class="card-box">
+        <div class="card-head">
+          <span class="head-title">Tezkor Ko'rinish</span>
+          <span style="font-size: 11px; color: var(--cyan-neon); cursor: pointer;" onclick="switchScreen('history')">Barchasi →</span>
         </div>
-        <div class="debt-card">
-          <div class="debt-lbl">⚠️ Qaytarishim kerak:</div>
-          <div class="debt-val" style="color: var(--warning);" id="debtTakenTotal">0 UZS</div>
+        <div id="recentTxList">
+          <p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 12px;">Hozircha amallar yo'q</p>
         </div>
       </div>
     </div>
 
-    <!-- Tugmalar -->
-    <div class="action-row">
-      <button class="btn-act btn-cyan" onclick="openInput('income')">＋ Kirim</button>
-      <button class="btn-act btn-dark" onclick="openInput('expense')">− Xarajat</button>
+    <!-- 2-OYNA: ANALITIKA -->
+    <div id="screenAnalytics" class="view-screen">
+      <div class="filter-tabs">
+        <button class="tab-btn active" onclick="setPeriod('month')">Shu oy (30 k)</button>
+        <button class="tab-btn" onclick="setPeriod('week')">Haftalik (7 k)</button>
+        <button class="tab-btn" onclick="setPeriod('today')">Bugun</button>
+        <button class="tab-btn" onclick="setPeriod('all')">Barchasi</button>
+      </div>
+
+      <div class="card-box">
+        <div class="card-head">
+          <span class="head-title">Yo'nalishlar Bo'yicha Tahlil</span>
+          <span style="font-size: 11px; color: var(--danger);" id="periodExpTotal">-0 UZS</span>
+        </div>
+        <div id="categoryBreakdownList">
+          <p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 10px;">Xarajatlar mavjud emas</p>
+        </div>
+      </div>
+
+      <div class="card-box">
+        <div class="card-head">
+          <span class="head-title">Ulushlar Diagrammasi</span>
+          <span style="font-size: 11px; color: var(--cyan-neon);">Chart.js</span>
+        </div>
+        <div style="position: relative; height: 210px; width: 100%;">
+          <canvas id="financeChart"></canvas>
+        </div>
+      </div>
     </div>
 
-    <!-- Kunbay Tarix & Arxiv -->
-    <div class="card-box">
-      <div class="card-head">
-        <span class="head-title">Kunbay Sarf-Xarajatlar</span>
-        <span style="font-size: 11px; color: var(--cyan-neon); font-weight: 700;" id="daySumPreview">0 UZS</span>
+    <!-- 3-OYNA: QARZLAR & NASIYA -->
+    <div id="screenDebts" class="view-screen">
+      <div class="debt-stat-grid">
+        <div class="debt-box">
+          <div class="debt-box-title">🤝 Qaytarishlari kerak:</div>
+          <div class="debt-box-val" style="color: var(--cyan-neon);" id="debtGivenTotal">0 UZS</div>
+        </div>
+        <div class="debt-box">
+          <div class="debt-box-title">⚠️ Qaytarishim kerak:</div>
+          <div class="debt-box-val" style="color: var(--warning);" id="debtTakenTotal">0 UZS</div>
+        </div>
       </div>
 
-      <div class="archive-tabs">
-        <div class="arc-chip active" onclick="setDayFilter('today')">Bugun</div>
-        <div class="arc-chip" onclick="setDayFilter('yesterday')">Kecha</div>
-        <div class="arc-chip" onclick="setDayFilter('before')">Avvalgi kunlar</div>
-        <div class="arc-chip" onclick="setDayFilter('all')">Hammasi</div>
+      <div class="card-box">
+        <div class="card-head">
+          <span class="head-title">Qarz Amallari & Muddatlar</span>
+          <span style="font-size: 11px; color: var(--cyan-neon);">Eslatmalar faol</span>
+        </div>
+        <div id="debtTxList">
+          <p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 12px;">Qarz yozuvlari yo'q</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4-OYNA: KUNBAY TARIX -->
+    <div id="screenHistory" class="view-screen">
+      <div class="filter-tabs">
+        <button class="tab-btn active" onclick="setDayFilter('today')">Bugun</button>
+        <button class="tab-btn" onclick="setDayFilter('yesterday')">Kecha</button>
+        <button class="tab-btn" onclick="setDayFilter('before')">Avvalgi</button>
+        <button class="tab-btn" onclick="setDayFilter('all')">Hammasi</button>
       </div>
 
-      <div id="dayTxList">
-        <p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 12px;">Ma'lumot topilmadi</p>
+      <div class="card-box">
+        <div class="card-head">
+          <span class="head-title">Kunlik Yozuvlar</span>
+          <span style="font-size: 11px; color: var(--cyan-neon); font-weight: 700;" id="daySumPreview">0 UZS</span>
+        </div>
+        <div id="dayTxList">
+          <p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 12px;">Ma'lumot topilmadi</p>
+        </div>
       </div>
+    </div>
+
+    <!-- Paski Glassmorphism Dock Navigatsiya -->
+    <div class="glass-dock-nav">
+      <button class="dock-btn active" onclick="switchScreen('dashboard')">
+        <span class="dock-icon">📊</span>
+        <span>Asosiy</span>
+      </button>
+      <button class="dock-btn" onclick="switchScreen('analytics')">
+        <span class="dock-icon">📈</span>
+        <span>Analitika</span>
+      </button>
+      <button class="dock-btn" onclick="switchScreen('debts')">
+        <span class="dock-icon">🤝</span>
+        <span>Qarzlar</span>
+      </button>
+      <button class="dock-btn" onclick="switchScreen('history')">
+        <span class="dock-icon">🕒</span>
+        <span>Tarix</span>
+      </button>
     </div>
   </div>
 
@@ -176,16 +325,15 @@
     <div class="modal-sheet">
       <h3 id="modalTitle" style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Amal Kiritish</h3>
       
-      <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 6px;">Summa:</div>
-      <input type="number" id="inAmt" class="input-box" placeholder="Summani kiriting" inputmode="numeric">
+      <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 6px;">Summa (so'm):</div>
+      <input type="number" id="inAmt" class="input-box" placeholder="Masalan: 50000" inputmode="numeric">
 
       <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 6px;">Tezkor toifa:</div>
       <div class="chips-group" id="chipsContainer"></div>
 
-      <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 6px;">Nomi / Izoh (kimga yoki nima uchun):</div>
-      <input type="text" id="inCat" class="input-box" placeholder="Masalan: Yandex, Abet, Ali qarz">
+      <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 6px;">Izoh / Kimga yoki Nima uchun:</div>
+      <input type="text" id="inCat" class="input-box" placeholder="Masalan: Abet (Osh), Yandex, Ali qarz">
 
-      <!-- Qarz bo'lsa eslatma sanasi -->
       <div id="debtDueDateWrap" style="display: none;">
         <div style="font-size: 11px; color: var(--warning); margin-bottom: 6px;">⏰ Qaytarish sanasi (Bot SMS eslatadi):</div>
         <input type="date" id="inDueDate" class="input-box">
@@ -220,14 +368,47 @@
     const EXP_CATS = ['🍽 Abet / Tushlik', '🚕 Taksi', '🛒 Oziq-ovqat', '💡 Kommunal', '🤝 Qarz berdim', '💸 Qarz qaytardim'];
     const INC_CATS = ['💼 Oylik Maosh', '🤝 Qarz oldim', '💵 Qarz qaytdi', '📈 Savdo / Foyda'];
 
-    let records = JSON.parse(localStorage.getItem('moliya_data_v5') || '[]');
+    let records = JSON.parse(localStorage.getItem('moliya_data_v6') || '[]');
     let currentMode = 'expense';
     let editId = null;
     let selectedDayFilter = 'today';
+    let currentPeriod = 'month';
+    let chartObj = null;
+
+    // Pastdagi oyna almashtirgich (Dock navigation)
+    function switchScreen(screenName) {
+      document.querySelectorAll('.view-screen').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.dock-btn').forEach(btn => btn.classList.remove('active'));
+
+      const map = {
+        'dashboard': { id: 'screenDashboard', title: 'Moliya Pro', sub: 'Asosiy Boshqaruv' },
+        'analytics': { id: 'screenAnalytics', title: 'Analitika', sub: 'Davriy Tahlillar' },
+        'debts': { id: 'screenDebts', title: 'Qarz & Nasiya', sub: 'Muddatlar va Eslatmalar' },
+        'history': { id: 'screenHistory', title: 'Kunbay Tarix', sub: 'Xarajatlar Arxivi' }
+      };
+
+      document.getElementById(map[screenName].id).classList.add('active');
+      event.currentTarget.classList.add('active');
+      document.getElementById('screenHeaderTitle').innerText = map[screenName].title;
+      document.getElementById('screenHeaderSub').innerText = map[screenName].sub;
+
+      if (screenName === 'analytics') renderAnalytics();
+      if (screenName === 'debts') renderDebts();
+      if (screenName === 'history') renderDayList();
+
+      if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+    }
+
+    function setPeriod(p) {
+      currentPeriod = p;
+      document.querySelectorAll('#screenAnalytics .tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderAnalytics();
+    }
 
     function setDayFilter(type) {
       selectedDayFilter = type;
-      document.querySelectorAll('.arc-chip').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('#screenHistory .tab-btn').forEach(el => el.classList.remove('active'));
       event.target.classList.add('active');
       renderDayList();
     }
@@ -268,12 +449,7 @@
     }
 
     function toggleDebtDate(name) {
-      const wrap = document.getElementById('debtDueDateWrap');
-      if (name.includes('Qarz')) {
-        wrap.style.display = 'block';
-      } else {
-        wrap.style.display = 'none';
-      }
+      document.getElementById('debtDueDateWrap').style.display = name.includes('Qarz') ? 'block' : 'none';
     }
 
     function closeModal() {
@@ -290,7 +466,6 @@
 
       const now = new Date();
       if (editId) {
-        // Tahrirlash
         const index = records.findIndex(r => r.id === editId);
         if (index !== -1) {
           records[index].amount = amt;
@@ -298,21 +473,18 @@
           records[index].dueDate = dueDate;
         }
       } else {
-        // Yangi qo'shish
-        const newRecord = {
+        records.unshift({
           id: Date.now(),
           type: currentMode,
           amount: amt,
           category: cat,
           dueDate: dueDate || null,
           timestamp: now.getTime(),
-          dateKey: now.toISOString().split('T')[0], // YYYY-MM-DD
+          dateKey: now.toISOString().split('T')[0],
           date: now.toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' }),
           time: now.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
-        };
-        records.unshift(newRecord);
+        });
 
-        // Agar qarz eslatmasi bo'lsa bot serveriga jo'natish
         if (dueDate && tg) {
           tg.sendData(JSON.stringify({
             action: "set_debt_reminder",
@@ -323,7 +495,7 @@
         }
       }
 
-      localStorage.setItem('moliya_data_v5', JSON.stringify(records));
+      localStorage.setItem('moliya_data_v6', JSON.stringify(records));
       closeModal();
       renderAll();
       if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
@@ -332,7 +504,7 @@
     function deleteRecord(id) {
       if (confirm("Ushbu yozuv o'chirilsinmi?")) {
         records = records.filter(r => r.id !== id);
-        localStorage.setItem('moliya_data_v5', JSON.stringify(records));
+        localStorage.setItem('moliya_data_v6', JSON.stringify(records));
         renderAll();
         if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
       }
@@ -352,9 +524,7 @@
           incomeSum += r.amount;
         } else {
           expenseSum += r.amount;
-          if (r.dateKey === todayStr) {
-            todayExpense += r.amount;
-          }
+          if (r.dateKey === todayStr) todayExpense += r.amount;
         }
 
         if (r.category.includes('Qarz berdim')) debtGiven += r.amount;
@@ -368,7 +538,126 @@
       document.getElementById('debtGivenTotal').innerText = `${Math.max(0, debtGiven).toLocaleString()} UZS`;
       document.getElementById('debtTakenTotal').innerText = `${Math.max(0, debtTaken).toLocaleString()} UZS`;
 
+      // Asosiy ekrandagi oxirgi 4 ta amal
+      const recentEl = document.getElementById('recentTxList');
+      if (records.length === 0) {
+        recentEl.innerHTML = `<p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 12px;">Hozircha amallar yo'q</p>`;
+      } else {
+        recentEl.innerHTML = records.slice(0, 4).map(r => renderRowHTML(r)).join('');
+      }
+
+      renderAnalytics();
+      renderDebts();
       renderDayList();
+    }
+
+    function renderRowHTML(r) {
+      let icon = r.type === 'income' ? '⚡' : '💸';
+      if (r.category.includes('Taksi')) icon = '🚕';
+      else if (r.category.includes('Abet') || r.category.includes('Oziq-ovqat')) icon = '🍽';
+      else if (r.category.includes('Kommunal')) icon = '💡';
+      else if (r.category.includes('Qarz')) icon = '🤝';
+
+      return `
+        <div class="tx-row">
+          <div class="tx-left">
+            <div class="tx-icon-pill">${icon}</div>
+            <div>
+              <div class="tx-name">${r.category}</div>
+              <div class="tx-date">${r.date} ${r.time} ${r.dueDate ? '• ⏰ ' + r.dueDate : ''}</div>
+            </div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-amt" style="color: ${r.type === 'income' ? 'var(--cyan-neon)' : 'var(--danger)'}">
+              ${r.type === 'income' ? '+' : '-'}${r.amount.toLocaleString()}
+            </div>
+            <button class="btn-icon" onclick="openInput('${r.type}', ${r.id})">✏️</button>
+            <button class="btn-icon btn-del" onclick="deleteRecord(${r.id})">🗑</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAnalytics() {
+      const now = new Date();
+      const currentList = records.filter(r => {
+        if (currentPeriod === 'all') return true;
+        const diffDays = (now.getTime() - (r.timestamp || r.id)) / (1000 * 60 * 60 * 24);
+        if (currentPeriod === 'today') return r.dateKey === now.toISOString().split('T')[0];
+        if (currentPeriod === 'week') return diffDays <= 7;
+        if (currentPeriod === 'month') return diffDays <= 30;
+        return true;
+      });
+
+      let expSum = 0;
+      const catStats = {};
+
+      currentList.forEach(r => {
+        if (r.type === 'expense') {
+          expSum += r.amount;
+          catStats[r.category] = (catStats[r.category] || 0) + r.amount;
+        }
+      });
+
+      document.getElementById('periodExpTotal').innerText = `-${expSum.toLocaleString()} UZS`;
+
+      const breakdownBox = document.getElementById('categoryBreakdownList');
+      const catKeys = Object.keys(catStats);
+
+      if (catKeys.length === 0) {
+        breakdownBox.innerHTML = `<p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 10px;">Xarajatlar yo'q</p>`;
+      } else {
+        catKeys.sort((a, b) => catStats[b] - catStats[a]);
+        breakdownBox.innerHTML = catKeys.map(cat => {
+          const sum = catStats[cat];
+          const pct = expSum > 0 ? Math.round((sum / expSum) * 100) : 0;
+          return `
+            <div class="cat-bar-item">
+              <div class="cat-info-row">
+                <span class="cat-title-text">${cat} <span style="color: var(--text-dim); font-size: 10px;">(${pct}%)</span></span>
+                <span class="cat-amount-text">-${sum.toLocaleString()} UZS</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: ${pct}%;"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      if (chartObj) chartObj.destroy();
+      const canvas = document.getElementById('financeChart');
+      if (canvas) {
+        chartObj = new Chart(canvas.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: catKeys.length ? catKeys : ['Xarajat yo\'q'],
+            datasets: [{
+              data: catKeys.length ? Object.values(catStats) : [1],
+              backgroundColor: catKeys.length ? ['#2dd4bf', '#38bdf8', '#0284c7', '#fbbf24', '#fb7185', '#a855f7'] : ['rgba(255,255,255,0.05)'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '72%',
+            plugins: {
+              legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 6 } }
+            }
+          }
+        });
+      }
+    }
+
+    function renderDebts() {
+      const debtList = records.filter(r => r.category.includes('Qarz'));
+      const el = document.getElementById('debtTxList');
+      if (debtList.length === 0) {
+        el.innerHTML = `<p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 12px;">Qarz yozuvlari yo'q</p>`;
+      } else {
+        el.innerHTML = debtList.map(r => renderRowHTML(r)).join('');
+      }
     }
 
     function renderDayList() {
@@ -377,15 +666,10 @@
       const yesterdayStr = yestDate.toISOString().split('T')[0];
 
       let filtered = [];
-      if (selectedDayFilter === 'today') {
-        filtered = records.filter(r => r.dateKey === todayStr);
-      } else if (selectedDayFilter === 'yesterday') {
-        filtered = records.filter(r => r.dateKey === yesterdayStr);
-      } else if (selectedDayFilter === 'before') {
-        filtered = records.filter(r => r.dateKey !== todayStr && r.dateKey !== yesterdayStr);
-      } else {
-        filtered = records;
-      }
+      if (selectedDayFilter === 'today') filtered = records.filter(r => r.dateKey === todayStr);
+      else if (selectedDayFilter === 'yesterday') filtered = records.filter(r => r.dateKey === yesterdayStr);
+      else if (selectedDayFilter === 'before') filtered = records.filter(r => r.dateKey !== todayStr && r.dateKey !== yesterdayStr);
+      else filtered = records;
 
       let subTotalExp = 0;
       filtered.forEach(r => { if (r.type === 'expense') subTotalExp += r.amount; });
@@ -393,26 +677,9 @@
 
       const listEl = document.getElementById('dayTxList');
       if (filtered.length === 0) {
-        listEl.innerHTML = `<p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 12px;">Hech qanday amal kiritilmagan</p>`;
+        listEl.innerHTML = `<p style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 12px;">Ma'lumot topilmadi</p>`;
       } else {
-        listEl.innerHTML = filtered.map(r => `
-          <div class="tx-row">
-            <div class="tx-left">
-              <div class="tx-icon-pill">${r.type === 'income' ? '⚡' : '💸'}</div>
-              <div>
-                <div class="tx-name">${r.category}</div>
-                <div class="tx-date">${r.date} ${r.time} ${r.dueDate ? '• ⏰ Qaytish: ' + r.dueDate : ''}</div>
-              </div>
-            </div>
-            <div class="tx-right">
-              <div class="tx-amt" style="color: ${r.type === 'income' ? 'var(--cyan-neon)' : 'var(--danger)'}">
-                ${r.type === 'income' ? '+' : '-'}${r.amount.toLocaleString()}
-              </div>
-              <button class="btn-icon" onclick="openInput('${r.type}', ${r.id})">✏️</button>
-              <button class="btn-icon btn-del" onclick="deleteRecord(${r.id})">🗑</button>
-            </div>
-          </div>
-        `).join('');
+        listEl.innerHTML = filtered.map(r => renderRowHTML(r)).join('');
       }
     }
 
