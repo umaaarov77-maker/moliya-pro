@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Moliya Pro — Shaxsiy Kapital Nazorati</title>
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Chart.js & Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #07090e;
+      --card-bg: rgba(18, 23, 38, 0.72);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-glow: rgba(56, 189, 248, 0.08);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #3b82f6 50%, #6366f1 100%);
+      --income-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --expense-gradient: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+      --income: #10b981;
+      --expense: #f43f5e;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.1) 0px, transparent 50%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px 16px 85px;
+      overflow-x: hidden;
+    }
+
+    /* Bloklangan ekran */
+    #blockedScreen {
+      display: none;
+      height: 85vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .lock-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 30px rgba(244, 63, 94, 0.2);
+    }
+
+    /* Asosiy interfeys */
+    #appContent {
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      padding: 6px 14px 6px 8px;
+      border-radius: 100px;
+      backdrop-filter: blur(10px);
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .badge-secure {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    /* Premium Balans Kartasi */
+    .hero-card {
+      position: relative;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 26px;
+      padding: 24px 20px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .balance-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .balance-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .eye-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .balance-val {
+      font-size: 34px;
+      font-weight: 800;
+      margin: 10px 0 20px;
+      letter-spacing: -0.5px;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .balance-val span {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-muted);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .stats-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 10px 14px;
+    }
+
+    .stat-pill .tag {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .stat-pill .num {
+      font-size: 16px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    /* Tugmalar */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .action-btn {
+      border: none;
+      padding: 15px;
+      border-radius: 18px;
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 10px 20px -6px rgba(0, 0, 0, 0.3);
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .action-btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-inc {
+      background: var(--income-gradient);
+      box-shadow: 0 10px 20px -6px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-exp {
+      background: var(--expense-gradient);
+      box-shadow: 0 10px 20px -6px rgba(244, 63, 94, 0.35);
+    }
+
+    /* Kartalar bloki */
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 18px;
+      backdrop-filter: blur(16px);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title .hint {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .chart-box {
+      position: relative;
+      width: 100%;
+      height: 230px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Amaliyotlar ro'yxati */
+    .tx-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .tx-item:last-child {
+      border-bottom: none;
+    }
+
+    .tx-icon-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tx-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+
+    .tx-cat-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .tx-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .tx-amount {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    /* Bottom Sheet Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      align-items: flex-end;
+    }
+
+    .bottom-sheet {
+      background: #0f1422;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 28px 28px 0 0;
+      width: 100%;
+      padding: 24px 20px 34px;
+      animation: sheetUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes sheetUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .sheet-pill {
+      width: 44px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      margin: 0 auto 18px;
+    }
+
+    .input-grp {
+      margin-bottom: 14px;
+    }
+
+    .input-grp label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .custom-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .custom-input:focus {
+      border-color: #38bdf8;
+    }
+
+    .chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background: var(--accent-gradient);
+      border-color: transparent;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Begonalar uchun Qulflangan Ekran -->
+  <div id="blockedScreen">
+    <div class="lock-circle">🔐</div>
+    <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 8px;">Maxfiy Tizim</h2>
+    <p style="color: var(--text-muted); font-size: 14px; line-height: 1.5; max-width: 280px;">
+      Bu moliyaviy tizim faqat ruxsat etilgan 2 ta akkaunt (ID) uchun yopiq rejimda himoyalangan.
+    </p>
+  </div>
+
+  <!-- Asosiy Premium UI -->
+  <div id="appContent">
+    <!-- Top Bar -->
+    <div class="header-bar">
+      <div class="user-pill">
+        <div class="user-avatar" id="avatarLetter">U</div>
+        <div class="user-name" id="profileName">Foydalanuvchi</div>
+      </div>
+      <div class="badge-secure">● Shaxsiy Pro</div>
+    </div>
+
+    <!-- Asosiy Balans -->
+    <div class="hero-card">
+      <div class="balance-header">
+        <div class="balance-subtitle">Sof Kapital (Balans)</div>
+        <button class="eye-btn" onclick="toggleBalance()">👁️</button>
+      </div>
+      <div class="balance-val" id="balanceAmount">0 <span>UZS</span></div>
+
+      <div class="stats-split">
+        <div class="stat-pill">
+          <div class="tag">
+            <span class="tag-dot" style="background: var(--income);"></span> Oylik Kirim
+          </div>
+          <div class="num" style="color: var(--income);" id="totalInc">+0 UZS</div>
+        </div>
+        <div class="stat-pill">
+          <div class="tag">
+            <span class="tag-dot" style="background: var(--expense);"></span> Oylik Chiqim
+          </div>
+          <div class="num" style="color: var(--expense);" id="totalExp">-0 UZS</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tezkor Amallar -->
+    <div class="quick-actions">
+      <button class="action-btn btn-inc" onclick="openModal('income')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Kirim qo'shish
+      </button>
+      <button class="action-btn btn-exp" onclick="openModal('expense')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/></svg>
+        Xarajat yozish
+      </button>
+    </div>
+
+    <!-- Xarajatlar Tahlili (Chart) -->
+    <div class="section-card">
+      <div class="card-title">
+        <span>Xarajatlar Tahlili</span>
+        <span class="hint">Kategoriyalar</span>
+      </div>
+      <div class="chart-box">
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Oxirgi Tranzaksiyalar -->
+    <div class="section-card">
+      <div class="card-title">
+        <span>Oxirgi Tranzaksiyalar</span>
+        <span class="hint" style="cursor: pointer; color: #38bdf8;" onclick="clearHistory()">Tozalash</span>
+      </div>
+      <div id="txListContainer">
+        <p style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 16px;">Hozircha ma'lumotlar yo'q</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet Kiritish Modali -->
+  <div class="modal-overlay" id="actionModal">
+    <div class="bottom-sheet">
+      <div class="sheet-pill"></div>
+      <h3 id="modalHead" style="font-size: 18px; font-weight: 800; margin-bottom: 16px;">Yangi Amaliyot</h3>
+
+      <div class="input-grp">
+        <label>Summa (so'm)</label>
+        <input type="number" id="inputAmount" class="custom-input" placeholder="Masalan: 150000" inputmode="numeric">
+      </div>
+
+      <div class="input-grp">
+        <label>Tezkor Kategoriyalar</label>
+        <div class="chips-grid" id="categoryChips"></div>
+      </div>
+
+      <div class="input-grp">
+        <label>Yoki o'zingiz yozing</label>
+        <input type="text" id="inputCategory" class="custom-input" placeholder="Izoh yoki toifa">
+      </div>
+
+      <button class="action-btn btn-inc" id="saveBtn" style="width: 100%; margin-top: 12px;" onclick="confirmSave()">
+        Tasdiqlash & Saqlash
+      </button>
+      <button onclick="closeModal()" style="width: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 14px; font-weight: 600; padding: 12px; margin-top: 4px; cursor: pointer;">
+        Bekor qilish
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      try { tg.setHeaderColor('#07090e'); } catch(e) {}
+    }
+
+    // Faqat ruxsat etilgan 2 ta maxsus ID
+    const WHITELIST_IDS = [7789172387, 8622259094];
+
+    // Tekshirish
+    const userId = tg?.initDataUnsafe?.user?.id;
+    const userName = tg?.initDataUnsafe?.user?.first_name || "Moliya";
+
+    if (userId && WHITELIST_IDS.includes(userId)) {
+      document.getElementById('appContent').style.display = 'block';
+      document.getElementById('blockedScreen').style.display = 'none';
+      document.getElementById('profileName').innerText = userName;
+      document.getElementById('avatarLetter').innerText = userName.charAt(0).toUpperCase();
+    } else {
+      document.getElementById('appContent').style.display = 'none';
+      document.getElementById('blockedScreen').style.display = 'flex';
+    }
+
+    let records = JSON.parse(localStorage.getItem('moliya_pro_records') || '[]');
+    let currentMode = 'expense';
+    let balanceVisible = true;
+    let chartInstance = null;
+
+    const expenseCategories = ['🍽 Oziq-ovqat', '🚕 Transport', '🛍 Bozor / Xarid', '🏠 Uy / Ijara', '💡 Kommunal', '💻 Server / Tech'];
+    const incomeCategories = ['💼 Oylik Maosh', '📈 Trading / Foyda', '🤝 Freelance', '🎁 Sovg'a / Boshqa'];
+
+    function toggleBalance() {
+      balanceVisible = !balanceVisible;
+      renderData();
+    }
+
+    function openModal(mode) {
+      currentMode = mode;
+      document.getElementById('modalHead').innerText = mode === 'income' ? "Kirim Kiritish" : "Xarajat Kiritish";
+      const saveBtn = document.getElementById('saveBtn');
+      if (mode === 'income') {
+        saveBtn.className = "action-btn btn-inc";
+      } else {
+        saveBtn.className = "action-btn btn-exp";
+      }
+
+      // Kategoriya chipslari
+      const chips = mode === 'income' ? incomeCategories : expenseCategories;
+      const chipsBox = document.getElementById('categoryChips');
+      chipsBox.innerHTML = chips.map(c => `<div class="chip" onclick="selectChip('${c}')">${c}</div>`).join('');
+
+      document.getElementById('inputAmount').value = '';
+      document.getElementById('inputCategory').value = '';
+      document.getElementById('actionModal').style.display = 'flex';
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+    }
+
+    function selectChip(text) {
+      document.getElementById('inputCategory').value = text;
+      document.querySelectorAll('.chip').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('actionModal').style.display = 'none';
+    }
+
+    function confirmSave() {
+      const amt = parseFloat(document.getElementById('inputAmount').value);
+      const cat = document.getElementById('inputCategory').value.trim() || (currentMode === 'income' ? 'Kirim' : 'Xarajat');
+
+      if (!amt || amt <= 0) {
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+        return;
+      }
+
+      records.unshift({
+        id: Date.now(),
+        type: currentMode,
+        amount: amt,
+        category: cat,
+        date: new Date().toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' }),
+        time: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
+      });
+
+      localStorage.setItem('moliya_pro_records', JSON.stringify(records));
+      closeModal();
+      renderData();
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+    }
+
+    function clearHistory() {
+      if (confirm("Barcha yozuvlarni tozalashni xohlaysizmi?")) {
+        records = [];
+        localStorage.removeItem('moliya_pro_records');
+        renderData();
+      }
+    }
+
+    function renderData() {
+      let incomeSum = 0;
+      let expenseSum = 0;
+      const catStats = {};
+
+      records.forEach(r => {
+        if (r.type === 'income') {
+          incomeSum += r.amount;
+        } else {
+          expenseSum += r.amount;
+          catStats[r.category] = (catStats[r.category] || 0) + r.amount;
+        }
+      });
+
+      const netBalance = incomeSum - expenseSum;
+
+      // Balansni formatlash
+      if (balanceVisible) {
+        document.getElementById('balanceAmount').innerHTML = `${netBalance.toLocaleString()} <span>UZS</span>`;
+      } else {
+        document.getElementById('balanceAmount').innerHTML = `•••••••• <span>UZS</span>`;
+      }
+
+      document.getElementById('totalInc').innerText = `+${incomeSum.toLocaleString()} UZS`;
+      document.getElementById('totalExp').innerText = `-${expenseSum.toLocaleString()} UZS`;
+
+      // Tranzaksiyalar
+      const listContainer = document.getElementById('txListContainer');
+      if (records.length === 0) {
+        listContainer.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 16px;">Hozircha amaliyotlar yo'q</p>`;
+      } else {
+        listContainer.innerHTML = records.slice(0, 10).map(item => `
+          <div class="tx-item">
+            <div class="tx-icon-title">
+              <div class="tx-icon">${item.type === 'income' ? '💰' : '💳'}</div>
+              <div>
+                <div class="tx-cat-name">${item.category}</div>
+                <div class="tx-meta">${item.date} • ${item.time}</div>
+              </div>
+            </div>
+            <div class="tx-amount" style="color: ${item.type === 'income' ? 'var(--income)' : 'var(--expense)'}">
+              ${item.type === 'income' ? '+' : '-'}${item.amount.toLocaleString()} UZS
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Grafikni qayta chizish
+      drawChart(catStats);
+    }
+
+    function drawChart(catStats) {
+      const labels = Object.keys(catStats);
+      const data = Object.values(catStats);
+
+      if (chartInstance) chartInstance.destroy();
+
+      const ctx = document.getElementById('categoryChart').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels.length ? labels : ['Xarajat yo'q'],
+          datasets: [{
+            data: data.length ? data : [1],
+            backgroundColor: labels.length 
+              ? ['#f43f5e', '#38bdf8', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899', '#64748b']
+              : ['rgba(255, 255, 255, 0.08)'],
+            borderWidth: 0,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '72%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#94a3b8',
+                padding: 12,
+                boxWidth: 10,
+                font: { size: 11, family: "'Plus Jakarta Sans', sans-serif", weight: '600' }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    renderData();
+  </script>
+</body>
+</html>
